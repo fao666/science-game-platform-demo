@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1f48" />
+  <title>科学能量站｜小学科学游戏</title>
+  <meta name="description" content="面向小学科学课堂的卡通教育游戏平台前端演示。" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b1f48'/%3E%3Cpath d='M36 7 16 35h14l-3 22 21-31H34z' fill='%23ffd45e'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --navy: #0b1f48;
+      --navy-2: #102e67;
+      --blue: #2764d9;
+      --cyan: #55d6e7;
+      --yellow: #ffd45e;
+      --orange: #ff8b45;
+      --green: #42c98a;
+      --ink: #16213d;
+      --muted: #65728f;
+      --paper: #f3f6fb;
+      --white: #fff;
+      --line: #dce6f7;
+      --shadow: 0 18px 50px rgba(15, 43, 92, .14);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(1280px, calc(100% - 32px)); margin: auto; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, .96);
+      border-bottom: 1px solid #e2e8f2;
+      backdrop-filter: blur(16px);
+    }
+    .topbar { height: 64px; display: flex; align-items: center; gap: 20px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 19px; color: var(--navy); white-space: nowrap; }
+    .brand-mark {
+      width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
+      background: var(--blue); color: white; box-shadow: 0 6px 15px rgba(39,100,217,.18);
+      font-size: 21px;
+    }
+    nav { display: flex; gap: 2px; margin-left: 18px; }
+    .nav-btn {
+      position: relative; border: 0; background: transparent; color: #4f5665; padding: 21px 13px 18px; border-radius: 0; font-weight: 500;
+    }
+    .nav-btn:hover, .nav-btn.active { color: var(--blue); background: transparent; }
+    .nav-btn.active::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 0; height: 3px; border-radius: 3px 3px 0 0; background: var(--blue); }
+    .teacher-btn { margin-left: auto; border: 1px solid #d7e3f7; background: #f7faff; color: var(--blue); padding: 9px 15px; border-radius: 20px; font-weight: 800; }
+
+    .view { display: none; }
+    .view.active { display: block; }
+    .portal-title { text-align: center; margin: 34px 0 20px; color: #252d3b; font-size: 30px; font-weight: 900; }
+    .portal-title::before, .portal-title::after { content: "\\\\\\"; color: #1687f8; letter-spacing: 3px; margin: 0 18px; font-size: 21px; }
+    .hero { padding: 0 0 16px; }
+    .hero-card {
+      min-height: 308px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      background: linear-gradient(105deg,#fff 5%,#e9fff7 55%,#bef8df 100%);
+      box-shadow: 0 5px 20px rgba(28,72,128,.06);
+      isolation: isolate;
+    }
+    .student-art { position: absolute; right: 44px; bottom: -42px; width: 42%; max-height: 350px; object-fit: contain; object-position: center bottom; }
+    .hero-copy { width: min(610px, 58%); padding: 46px 0 34px 48px; color: var(--ink); position: relative; z-index: 2; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--blue); font-size: 14px; font-weight: 800; }
+    h1 { margin: 11px 0 10px; font-size: clamp(32px, 4vw, 46px); line-height: 1.08; letter-spacing: -1px; }
+    .hero-copy p { margin: 0 0 24px; max-width: 470px; color: #617087; font-size: 17px; }
+    .grade-shortcuts { display: grid; grid-template-columns: repeat(3,92px); gap: 10px 14px; margin-bottom: 20px; }
+    .grade-shortcut { border: 0; background: rgba(255,255,255,.72); color: #3c4b61; border-radius: 18px; padding: 7px 10px; }
+    .grade-shortcut:hover { color: var(--blue); background: white; }
+    .join-card { display: flex; gap: 8px; padding: 6px; width: min(410px, 100%); border-radius: 8px; background: white; border: 1px solid #dce8f3; }
+    .join-card input { min-width: 0; flex: 1; border: 0; outline: 0; padding: 12px; color: var(--ink); background: transparent; }
+    .primary {
+      border: 0; border-radius: 6px; padding: 11px 18px; background: var(--blue); color: white; font-weight: 900; transition: .18s ease;
+    }
+    .primary:hover { background: #1454c7; }
+    .primary:active { transform: translateY(1px); }
+    .hero-note { margin-top: 9px; color: #8490a2; font-size: 13px; }
+
+    .section { padding: 24px 0 64px; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+    .section-head h2 { margin: 0; font-size: 28px; color: #252d3b; }
+    .section-head p { margin: 4px 0 0; color: var(--muted); }
+    .grade-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+    .grade-tab { border: 1px solid #d7e2f3; background: white; border-radius: 7px; padding: 10px 18px; color: #52617e; font-weight: 800; }
+    .grade-tab:hover, .grade-tab.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+    .game-grid { display: grid; grid-template-columns: 1.45fr 1fr; gap: 20px; }
+    .game-card, .coming-card { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: white; box-shadow: 0 5px 18px rgba(26,60,113,.06); }
+    .game-card { display: grid; grid-template-columns: 1.05fr .95fr; min-height: 330px; }
+    .game-art { background: url("assets/power-city-hero.png") 66% center/cover; position: relative; }
+    .badge { position: absolute; top: 18px; left: 18px; border-radius: 999px; padding: 7px 11px; background: var(--green); color: white; font-size: 13px; font-weight: 900; }
+    .game-info { padding: 30px; display: flex; flex-direction: column; align-items: flex-start; }
+    .game-info small { color: var(--blue); font-weight: 900; }
+    .game-info h3 { margin: 8px 0; color: var(--navy); font-size: 27px; line-height: 1.2; }
+    .game-info p { margin: 0; color: var(--muted); }
+    .meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 18px 0 24px; }
+    .meta span { background: #edf3ff; color: #3c5480; padding: 6px 10px; border-radius: 9px; font-size: 13px; font-weight: 700; }
+    .play-btn { margin-top: auto; border: 0; border-radius: 13px; padding: 12px 18px; background: var(--blue); color: white; font-weight: 900; }
+    .coming-card { padding: 30px; display: flex; flex-direction: column; justify-content: center; background: linear-gradient(145deg,#fff,#edf5ff); }
+    .coming-icon { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 10px; background: #e2ebfb; font-size: 28px; }
+    .coming-card h3 { margin: 16px 0 8px; color: var(--navy); }
+    .coming-card p { margin: 0; color: var(--muted); }
+    .curriculum-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+    .unit-card { min-height: 250px; display: flex; flex-direction: column; overflow: hidden; border-radius: 12px; border: 1px solid var(--line); background: white; box-shadow: 0 5px 18px rgba(26,60,113,.06); }
+    .unit-cover { height: 96px; display: flex; align-items: center; justify-content: space-between; padding: 20px 22px; color: white; background: linear-gradient(120deg,#3779e7,#59b8ef); }
+    .unit-card:nth-child(2) .unit-cover { background: linear-gradient(120deg,#17a67b,#6bd3a5); }
+    .unit-card:nth-child(3) .unit-cover { background: linear-gradient(120deg,#f2a52d,#ffd36b); color: #5a3c00; }
+    .unit-card:nth-child(4) .unit-cover { background: linear-gradient(120deg,#69a82e,#b8d85c); }
+    .unit-card:nth-child(5) .unit-cover { background: linear-gradient(120deg,#315fca,#33b8d9); }
+    .unit-card:nth-child(6) .unit-cover { background: linear-gradient(120deg,#8b6953,#c59a6c); }
+    .unit-icon { font-size: 42px; line-height: 1; }
+    .unit-term { font-size: 13px; font-weight: 800; opacity: .9; }
+    .unit-body { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+    .unit-body h3 { margin: 0 0 7px; color: var(--navy); font-size: 21px; }
+    .unit-body p { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+    .unit-action { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .unit-status { font-size: 13px; font-weight: 800; color: #7c879a; }
+    .unit-status.ready { color: #168054; }
+    .outline-btn { border: 1px solid #b6c9ea; color: var(--blue); background: white; border-radius: 7px; padding: 8px 12px; font-weight: 800; }
+    .outline-btn:disabled { color: #97a2b3; border-color: #dce2eb; cursor: default; }
+
+    .game-screen { min-height: calc(100vh - 74px); padding: 24px 0 48px; background: radial-gradient(circle at 20% 0,#153b7d,var(--navy) 54%); color: white; }
+    .game-toolbar { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .back-btn { border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.08); color: white; border-radius: 12px; padding: 9px 13px; font-weight: 800; }
+    .game-title { font-weight: 900; }
+    .progress-wrap { margin-left: auto; display: flex; align-items: center; gap: 10px; min-width: 250px; }
+    .progress { flex: 1; height: 10px; border-radius: 999px; background: rgba(255,255,255,.15); overflow: hidden; }
+    .progress > div { width: 25%; height: 100%; background: var(--yellow); border-radius: inherit; }
+    .mission-layout { display: grid; grid-template-columns: 310px 1fr; gap: 20px; }
+    .mission-panel, .task-panel { border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.08); backdrop-filter: blur(12px); border-radius: 24px; }
+    .mission-panel { padding: 25px; }
+    .mission-label { color: var(--cyan); font-size: 14px; font-weight: 900; }
+    .mission-panel h2 { margin: 8px 0 12px; font-size: 28px; }
+    .mission-panel p { color: #d9e6ff; }
+    .objective { padding: 14px; border-radius: 14px; margin: 22px 0; background: rgba(85,214,231,.12); border: 1px solid rgba(85,214,231,.28); }
+    .objective strong { display: block; color: #9aeeff; margin-bottom: 5px; }
+    .hint-btn { width: 100%; border: 1px solid rgba(255,212,94,.5); background: rgba(255,212,94,.1); color: var(--yellow); border-radius: 13px; padding: 11px; font-weight: 900; }
+    .hint-box { display: none; margin-top: 12px; padding: 12px; border-radius: 12px; background: rgba(255,255,255,.09); color: #e8efff; font-size: 14px; }
+    .hint-box.show { display: block; }
+    .task-panel { padding: 28px; background: rgba(250,252,255,.97); color: var(--ink); }
+    .task-panel h2 { margin: 0 0 4px; color: var(--navy); }
+    .task-panel > p { margin: 0 0 22px; color: var(--muted); }
+    .choices { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .choice { border: 2px solid var(--line); background: white; border-radius: 18px; padding: 18px; min-height: 185px; text-align: left; transition: .18s; }
+    .choice:hover { border-color: #8fb4f3; transform: translateY(-3px); }
+    .choice strong { display: block; margin-bottom: 6px; color: var(--navy); font-size: 18px; }
+    .choice p { margin: 0; color: var(--muted); font-size: 14px; }
+    .circuit { height: 86px; margin-bottom: 14px; border-radius: 12px; background: #f2f6fd; display: grid; place-items: center; }
+    .circuit svg { width: 85%; height: 66px; }
+    .feedback { margin-top: 18px; min-height: 56px; border-radius: 14px; padding: 15px 17px; background: #eef4ff; color: #496184; }
+    .feedback.ok { background: #e6f9ef; color: #14784c; }
+    .feedback.bad { background: #fff1e7; color: #ad5024; }
+    .next-btn { display: none; margin: 16px 0 0 auto; border: 0; border-radius: 9px; padding: 11px 18px; background: var(--blue); color: white; font-weight: 900; }
+    .next-btn.show { display: block; }
+    .result-card { display: none; text-align: center; padding: 44px 24px; }
+    .result-card.show { display: block; }
+    .result-card .result-icon { font-size: 64px; }
+    .result-card h2 { margin: 12px 0 8px; }
+    .result-stats { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 22px 0; }
+    .result-stats span { padding: 10px 14px; border-radius: 9px; background: #eef4ff; color: #38527d; font-weight: 800; }
+    .interactive-stage { position: relative; min-height: 620px; overflow: hidden; border-radius: 18px; background: #0b1f48 url("assets/hospital-blackout.png") center/cover no-repeat; }
+    .interactive-stage::after { content:""; position:absolute; inset:0; pointer-events:none; background: linear-gradient(180deg,rgba(5,15,36,.05),rgba(5,15,36,.56)); transition:.5s; }
+    .interactive-stage.powered::after { background: radial-gradient(circle at 68% 22%,rgba(255,230,128,.48),rgba(8,26,55,.12) 54%,rgba(5,15,36,.32)); }
+    .scene-status { position:absolute; z-index:3; top:18px; left:18px; display:flex; align-items:center; gap:10px; padding:9px 13px; border-radius:9px; background:rgba(7,25,55,.82); color:white; font-weight:800; backdrop-filter:blur(8px); }
+    .scene-status i { width:10px; height:10px; border-radius:50%; background:#ff765d; box-shadow:0 0 12px #ff765d; }
+    .powered .scene-status i { background:#7bf0a9; box-shadow:0 0 14px #7bf0a9; }
+    .workbench { position:absolute; z-index:4; right:18px; bottom:18px; width:min(560px,calc(100% - 36px)); padding:18px; border-radius:16px; background:rgba(248,251,255,.96); box-shadow:0 18px 45px rgba(0,0,0,.3); color:var(--ink); }
+    .workbench-head { display:flex; align-items:start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .workbench h3 { margin:0; color:var(--navy); font-size:20px; }
+    .workbench p { margin:3px 0 0; color:var(--muted); font-size:14px; }
+    .toolbox { display:flex; gap:9px; flex-wrap:wrap; margin:12px 0; padding:10px; border-radius:11px; background:#eaf1fb; }
+    .tool { min-width:78px; border:2px solid transparent; border-radius:10px; padding:9px 10px; background:white; color:#30425f; font-weight:800; box-shadow:0 3px 8px rgba(30,60,110,.09); touch-action:none; user-select:none; }
+    .tool[draggable="true"] { cursor:grab; }
+    .tool.used { opacity:.35; pointer-events:none; }
+    .circuit-board { position:relative; height:245px; border:2px dashed #a9bcdb; border-radius:14px; background:#f8fbff; overflow:hidden; }
+    .drop-slot { position:absolute; z-index:3; width:112px; min-height:64px; display:grid; place-items:center; padding:7px; border:2px dashed #91a8ca; border-radius:11px; color:#667995; background:white; text-align:center; font-size:13px; font-weight:800; }
+    .drop-slot.filled { border-style:solid; border-color:#3b78df; color:#173d7a; background:#eaf2ff; font-size:15px; }
+    .slot-source { left:18px; top:88px; } .slot-control { left:220px; top:14px; } .slot-light { right:18px; top:88px; } .slot-path { left:220px; bottom:14px; }
+    .terminal { position:absolute; z-index:6; width:26px; height:26px; border:4px solid white; border-radius:50%; background:#ff8b45; box-shadow:0 0 0 2px #bd5c24,0 4px 8px rgba(0,0,0,.2); }
+    .terminal.selected { background:#ffd45e; box-shadow:0 0 0 3px #ff9d00,0 0 18px #ffd45e; }
+    .t0 { left:128px; top:107px; } .t1 { left:268px; top:78px; } .t2 { right:128px; top:107px; } .t3 { left:268px; bottom:78px; }
+    .wire-layer { position:absolute; inset:0; width:100%; height:100%; z-index:2; pointer-events:none; }
+    .wire-layer line { stroke:#2764d9; stroke-width:7; stroke-linecap:round; filter:drop-shadow(0 2px 2px rgba(0,0,0,.15)); }
+    .bench-actions { display:flex; gap:9px; margin-top:12px; }
+    .bench-actions button { border:0; border-radius:8px; padding:10px 14px; font-weight:900; }
+    .test-power { background:var(--blue); color:white; flex:1; }
+    .reset-wire { background:#e8eef7; color:#52617a; }
+    .game-message { min-height:46px; margin-top:10px; padding:11px 13px; border-radius:9px; background:#eef4ff; color:#405b86; font-size:14px; }
+    .game-message.ok { background:#e6f9ef; color:#14784c; }
+    .game-message.bad { background:#fff1e7; color:#ad5024; }
+    .hotspot { position:absolute; z-index:5; width:54px; height:54px; border:3px solid rgba(255,255,255,.85); border-radius:50%; background:rgba(255,139,69,.45); color:white; font-size:22px; animation:pulse 1.7s infinite; }
+    .hotspot.correct { left:24%; top:30%; } .hotspot.wrong-a { left:60%; top:21%; } .hotspot.wrong-b { left:76%; top:48%; }
+    @keyframes pulse { 50% { transform:scale(1.08); box-shadow:0 0 0 10px rgba(255,255,255,.08); } }
+    .simple-workbench { min-height:260px; }
+    .material-zones { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+    .material-zone { min-height:105px; display:grid; place-items:center; border:2px dashed #9eb2d1; border-radius:12px; background:#f5f9ff; color:#526985; font-weight:900; text-align:center; padding:12px; }
+    .material-zone.has-item { border-style:solid; border-color:#3b78df; background:#eaf2ff; color:#173d7a; }
+
+    .teacher { padding: 34px 0 70px; min-height: calc(100vh - 74px); }
+    .teacher-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .teacher-head h1 { font-size: 34px; color: var(--navy); margin: 0; }
+    .status-pill { border-radius: 999px; padding: 8px 12px; background: #e8f8ef; color: #168054; font-weight: 800; }
+    .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+    .stat { background: white; border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
+    .stat span { color: var(--muted); font-size: 14px; }
+    .stat strong { display: block; color: var(--navy); font-size: 30px; margin-top: 5px; }
+    .dashboard-grid { margin-top: 18px; display: grid; grid-template-columns: 1.25fr .75fr; gap: 18px; }
+    .panel { background: white; border: 1px solid var(--line); border-radius: 20px; padding: 22px; }
+    .panel h3 { margin: 0 0 18px; color: var(--navy); }
+    .bars { display: grid; gap: 17px; }
+    .bar-row { display: grid; grid-template-columns: 112px 1fr 44px; gap: 10px; align-items: center; font-size: 14px; }
+    .bar-track { height: 13px; background: #e9eff9; border-radius: 99px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg,var(--blue),var(--cyan)); }
+    .activity { list-style: none; padding: 0; margin: 0; display: grid; gap: 13px; }
+    .activity li { display: grid; grid-template-columns: 38px 1fr; gap: 10px; align-items: center; }
+    .avatar { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 13px; background: #e8f0ff; color: var(--blue); font-weight: 900; }
+    .activity strong { display: block; font-size: 14px; }
+    .activity small { color: var(--muted); }
+
+    .toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%,20px); padding: 12px 18px; border-radius: 13px; color: white; background: #17233f; opacity: 0; pointer-events: none; transition: .22s; z-index: 100; }
+    .toast.show { opacity: 1; transform: translate(-50%,0); }
+
+    @media (max-width: 880px) {
+      nav { display: none; }
+      .teacher-btn { margin-left: auto; }
+      .student-art { opacity: .26; right: -20px; width: 60%; }
+      .hero-copy { padding: 42px 28px; width: 76%; }
+      .game-grid, .dashboard-grid, .mission-layout { grid-template-columns: 1fr; }
+      .curriculum-grid { grid-template-columns: repeat(2,1fr); }
+      .game-card { grid-template-columns: 1fr; }
+      .game-art { min-height: 230px; }
+      .stats { grid-template-columns: repeat(2,1fr); }
+      .choices { grid-template-columns: 1fr; }
+      .curriculum-grid { grid-template-columns: 1fr; }
+      .progress-wrap { min-width: 150px; }
+      .interactive-stage { min-height:720px; }
+      .workbench { left:12px; right:12px; width:auto; bottom:12px; }
+    }
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 20px,1180px); }
+      .brand { font-size: 18px; }
+      .teacher-btn { padding: 9px 10px; font-size: 14px; }
+      .hero { padding-top: 10px; }
+      .portal-title { font-size: 25px; margin-top: 24px; }
+      .portal-title::before, .portal-title::after { margin: 0 7px; }
+      .hero-card { border-radius: 10px; min-height: 500px; }
+      .hero-copy { padding: 42px 20px; width: 100%; }
+      .student-art { width: 82%; right: -40px; opacity: .16; }
+      .grade-shortcuts { grid-template-columns: repeat(3,1fr); }
+      .join-card { flex-direction: column; }
+      .primary { width: 100%; }
+      .game-info { padding: 23px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .game-toolbar { flex-wrap: wrap; }
+      .progress-wrap { width: 100%; margin-left: 0; }
+      .circuit-board { height:285px; }
+      .drop-slot { width:94px; }
+      .slot-control,.slot-path { left:50%; transform:translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell topbar">
+      <div class="brand"><div class="brand-mark">⚡</div><span>科学能量站</span></div>
+      <nav aria-label="主导航">
+        <button class="nav-btn active" data-view="portal">首页</button>
+        <button class="nav-btn" data-scroll="courses">科学课程</button>
+        <button class="nav-btn" id="learningNav">学习记录</button>
+        <button class="nav-btn" id="activityNav">活动中心</button>
+      </nav>
+      <button class="teacher-btn" data-view="teacher">教师中心</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="view active" id="portalView">
+      <div class="portal-title">科学课程</div>
+      <div class="shell hero">
+        <div class="hero-card">
+          <div class="hero-copy">
+            <span class="eyebrow">小学科学游戏课程</span>
+            <h1>从一年级到六年级</h1>
+            <p>按年级进入科学任务，在观察、实验和挑战中理解科学。</p>
+            <div class="grade-shortcuts">
+              <button class="grade-shortcut" data-grade-jump="一">一年级 ›</button><button class="grade-shortcut" data-grade-jump="二">二年级 ›</button><button class="grade-shortcut" data-grade-jump="三">三年级 ›</button>
+              <button class="grade-shortcut" data-grade-jump="四">四年级 ›</button><button class="grade-shortcut" data-grade-jump="五">五年级 ›</button><button class="grade-shortcut" data-grade-jump="六">六年级 ›</button>
+            </div>
+            <div class="join-card">
+              <input id="classCode" aria-label="班级码" placeholder="输入班级码，例如 472815" inputmode="numeric" />
+              <button class="primary" id="joinBtn">进入课堂</button>
+            </div>
+            <div class="hero-note">体验版可直接点击进入，不会上传个人信息</div>
+          </div>
+          <img class="student-art" src="assets/science-students.png" alt="两名小学生向大家招手" />
+        </div>
+      </div>
+
+      <div class="shell section" id="courses">
+        <div class="section-head">
+          <div><h2>选择年级</h2><p id="gradeDescription">四年级正在进行电路主题科学任务</p></div>
+        </div>
+        <div class="grade-tabs" role="tablist" aria-label="年级筛选">
+          <button class="grade-tab" data-grade="一">一年级</button>
+          <button class="grade-tab" data-grade="二">二年级</button>
+          <button class="grade-tab" data-grade="三">三年级</button>
+          <button class="grade-tab active" data-grade="四">四年级</button>
+          <button class="grade-tab" data-grade="五">五年级</button>
+          <button class="grade-tab" data-grade="六">六年级</button>
+        </div>
+        <div class="curriculum-grid" id="gameGrid">
+          <article class="unit-card"><div class="unit-cover"><div><div class="unit-term">四年级上册 · 第一单元</div><strong>空气</strong></div><span class="unit-icon">🎈</span></div><div class="unit-body"><h3>空气动力研究所</h3><p>通过压缩空气、热气球和风的任务认识空气占据空间、可以被压缩并具有力量。</p><div class="unit-action"><span class="unit-status">方案已设计</span><button class="outline-btn" disabled>后续制作</button></div></div></article>
+          <article class="unit-card"><div class="unit-cover"><div><div class="unit-term">四年级上册 · 第二单元</div><strong>呼吸与消化</strong></div><span class="unit-icon">🫁</span></div><div class="unit-body"><h3>人体能量补给站</h3><p>沿着空气和食物在身体中的路径完成运输任务，理解呼吸、消化与健康。</p><div class="unit-action"><span class="unit-status">方案已设计</span><button class="outline-btn" disabled>后续制作</button></div></div></article>
+          <article class="unit-card"><div class="unit-cover"><div><div class="unit-term">四年级上册 · 第三单元</div><strong>声音</strong></div><span class="unit-icon">🎵</span></div><div class="unit-body"><h3>声音实验工坊</h3><p>调节材料的振动、强弱和高低，设计一件能够演奏的简易乐器。</p><div class="unit-action"><span class="unit-status">方案已设计</span><button class="outline-btn" disabled>后续制作</button></div></div></article>
+          <article class="unit-card"><div class="unit-cover"><div><div class="unit-term">四年级下册 · 第一单元</div><strong>植物的生长变化</strong></div><span class="unit-icon">🌱</span></div><div class="unit-body"><h3>凤仙花成长守护</h3><p>安排播种条件、观察根茎叶变化并帮助凤仙花完成从种子到种子的生命历程。</p><div class="unit-action"><span class="unit-status">方案已设计</span><button class="outline-btn" disabled>后续制作</button></div></div></article>
+          <article class="unit-card"><div class="unit-cover"><div><div class="unit-term">四年级下册 · 第二单元</div><strong>电路</strong></div><span class="unit-icon">⚡</span></div><div class="unit-body"><h3>游园会亮灯计划</h3><p>走进校园科学工坊，制作检测器，排查三件电池作品的不同故障，用观察解释修复。</p><div class="unit-action"><span class="unit-status ready">课堂试玩版可体验</span><button class="outline-btn" id="previewBtn">开始任务</button></div></div></article>
+          <article class="unit-card"><div class="unit-cover"><div><div class="unit-term">四年级下册 · 第三单元</div><strong>岩石与土壤</strong></div><span class="unit-icon">🪨</span></div><div class="unit-body"><h3>地质勘探队</h3><p>观察岩石和矿物特征、识别土壤组成，为城市建设挑选合适的自然材料。</p><div class="unit-action"><span class="unit-status">方案已设计</span><button class="outline-btn" disabled>后续制作</button></div></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="gameView">
+      <div class="game-screen">
+        <div class="shell">
+          <div class="game-toolbar">
+            <button class="back-btn" data-view="portal">← 返回大厅</button>
+            <span class="game-title">城市停电修复</span>
+            <div class="progress-wrap"><span id="progressText">1 / 4</span><div class="progress"><div id="progressBar"></div></div></div>
+          </div>
+          <div class="mission-layout">
+            <aside class="mission-panel">
+              <div class="mission-label" id="missionLabel">任务 01 · 医院急救电源</div>
+              <h2 id="missionTitle">点亮急诊室</h2>
+              <p id="missionStory">医院的备用照明失效了。请选择能够让灯泡正常发光的电路。</p>
+              <div class="objective"><strong id="objectiveCode">本关目标 K1</strong><span id="objectiveText">认识闭合电路，判断电流是否有完整通路。</span></div>
+              <button class="hint-btn" id="hintBtn">🤖 请求机器人提示</button>
+              <div class="hint-box" id="hintBox">第一级提示：请沿着导线检查，电流能不能从电池的一端出发，再回到另一端？</div>
+            </aside>
+            <div class="interactive-stage" id="interactiveStage">
+              <div class="scene-status"><i></i><span id="sceneStatusText">急诊室主照明：未恢复</span></div>
+              <div class="workbench" id="workbench"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="teacherView">
+      <div class="shell teacher">
+        <div class="teacher-head"><div><h1>四年级 2 班</h1><p>城市停电修复 · 体验场次 01</p></div><span class="status-pill">活动进行中</span></div>
+        <div class="stats">
+          <div class="stat"><span>已进入</span><strong>36 / 40</strong></div>
+          <div class="stat"><span>已完成</span><strong>28</strong></div>
+          <div class="stat"><span>平均首次正确率</span><strong>72%</strong></div>
+          <div class="stat"><span>平均提示次数</span><strong>1.6</strong></div>
+        </div>
+        <div class="dashboard-grid">
+          <div class="panel">
+            <h3>学习目标表现</h3>
+            <div class="bars">
+              <div class="bar-row"><span>K1 闭合电路</span><div class="bar-track"><div class="bar-fill" style="width:82%"></div></div><strong>82%</strong></div>
+              <div class="bar-row"><span>K2 故障诊断</span><div class="bar-track"><div class="bar-fill" style="width:64%"></div></div><strong>64%</strong></div>
+              <div class="bar-row"><span>K3 开关控制</span><div class="bar-track"><div class="bar-fill" style="width:76%"></div></div><strong>76%</strong></div>
+              <div class="bar-row"><span>K4 材料判断</span><div class="bar-track"><div class="bar-fill" style="width:71%"></div></div><strong>71%</strong></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>最近学习动态</h3>
+            <ul class="activity">
+              <li><span class="avatar">E8</span><div><strong>E018 完成故障排查</strong><small>尝试 2 次 · 使用 1 次提示</small></div></li>
+              <li><span class="avatar">E3</span><div><strong>E033 进入安全维修</strong><small>目前进度 75%</small></div></li>
+              <li><span class="avatar">E5</span><div><strong>E005 完成全部任务</strong><small>总用时 18 分 42 秒</small></div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const views = { portal: document.querySelector('#portalView'), game: document.querySelector('#gameView'), teacher: document.querySelector('#teacherView') };
+    const toast = document.querySelector('#toast');
+    const showToast = (message) => { toast.textContent = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2200); };
+    const openView = (name) => {
+      Object.values(views).forEach(view => view.classList.remove('active'));
+      views[name].classList.add('active');
+      document.querySelectorAll('[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view === name));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    document.querySelectorAll('[data-view]').forEach(btn => btn.addEventListener('click', () => { if(btn.dataset.view==='teacher'){window.location.href='./index.html?teacher=1';return;}openView(btn.dataset.view);}));
+    document.querySelector('#joinBtn').addEventListener('click', () => {
+      const code = document.querySelector('#classCode').value.trim();
+      if (!code) showToast('体验模式已开启，无需班级码');
+      setTimeout(() => { window.location.href = './index.html'; }, 260);
+    });
+    document.querySelector('#previewBtn').addEventListener('click', () => { window.location.href = './index.html'; });
+    document.querySelector('#learningNav').addEventListener('click', () => showToast('试玩进度和调查记录保存在当前设备，可在游戏内导出'));
+    document.querySelector('#activityNav').addEventListener('click', () => showToast('活动中心将在后续版本开放'));
+    document.querySelector('[data-scroll="courses"]').addEventListener('click', () => document.querySelector('#courses').scrollIntoView({ behavior: 'smooth' }));
+
+    document.querySelectorAll('.grade-tab').forEach(tab => tab.addEventListener('click', () => {
+      document.querySelectorAll('.grade-tab').forEach(item => item.classList.remove('active'));
+      tab.classList.add('active');
+      const grade = tab.dataset.grade;
+      document.querySelector('#gradeDescription').textContent = grade === '四' ? '四年级正在进行电路主题科学任务' : grade + '年级游戏正在建设中';
+      document.querySelector('#gameGrid').style.opacity = grade === '四' ? '1' : '.42';
+      showToast(grade === '四' ? '已显示四年级游戏' : grade + '年级内容正在建设中');
+    }));
+    document.querySelectorAll('[data-grade-jump]').forEach(btn => btn.addEventListener('click', () => {
+      document.querySelector(`.grade-tab[data-grade="${btn.dataset.gradeJump}"]`).click();
+      document.querySelector('#courses').scrollIntoView({ behavior: 'smooth' });
+    }));
+
+    /* 旧版按钮答题逻辑保留在注释中，便于对照研究版本。
+    const missions = [
+      { label:'任务 01 · 医院急救电源', title:'点亮急诊室', story:'医院的备用照明失效了。请选择能够让灯泡正常发光的连接。', code:'本关目标 K1', objective:'认识闭合电路，判断电流是否有完整通路。', question:'哪一种连接能点亮小灯泡？', guide:'观察电池、导线和灯泡的连接是否形成完整通路。', icon:'💡', options:[['灯泡只连接一侧','导线没有同时接触灯泡的两个连接点。'],['形成完整回路','电池、导线和灯泡首尾相连。'],['导线中间断开','通路中有一处没有连接。']], answer:1, success:'急诊室亮起来了！完整回路让电流经过小灯泡。', error:'灯还没有亮。检查灯泡两端是否都接入电路，以及导线有没有断开。', hints:['沿着导线走一圈，能不能回到电池另一端？','灯泡有两个连接点，两端都需要接入。','电池、导线和灯泡必须形成没有断开的完整回路。'] },
+      { label:'任务 02 · 图书馆照明', title:'找出电路故障', story:'图书馆的灯泡和电池都完好，但灯没有亮。请找出最可能的故障。', code:'本关目标 K2', objective:'根据现象排查断路、接触不良和元件连接问题。', question:'维修员首先应该检查哪里？', guide:'已知电池和灯泡完好，请判断还有什么会阻断电流。', icon:'🔎', options:[['更换一个更大的灯泡','灯泡本身已经经过检测。'],['检查导线接头','有一个接头松开，可能造成断路。'],['给电池涂上颜色','电池外观不会改变电路通断。']], answer:1, success:'找到故障了！重新压紧接头后，图书馆恢复照明。', error:'这个处理不能解决断路。请利用“电池和灯泡完好”这个证据继续排查。', hints:['先排除已经确认完好的元件。','电流需要经过每一个接头，松动也会形成断路。','检查导线与电池、灯泡连接点是否接触良好。'] },
+      { label:'任务 03 · 学校走廊', title:'安装控制开关', story:'学校希望不用拆导线就能控制走廊灯。请选择正确的开关安装方式。', code:'本关目标 K3', objective:'理解开关通过控制电路通断来控制用电器。', question:'开关应该怎样接入电路？', guide:'闭合开关时电路完整，断开开关时电路中断。', icon:'🎚️', options:[['与灯泡并排放置但不连接','开关没有进入电流通路。'],['串联接入电路','开关可以接通或切断唯一的通路。'],['只接在电池同一个接线端','不能控制完整回路。']], answer:1, success:'开关安装成功！合上灯亮，断开灯灭。', error:'这个位置不能有效控制整条电流通路。想一想开关断开时应该切断哪里。', hints:['开关必须成为电路通路的一部分。','断开开关时，电流唯一的路要被切断。','把开关串联接入简单电路中。'] },
+      { label:'任务 04 · 安全维修', title:'选择合适材料', story:'维修队要制作测试笔：内部需要导电，手握处必须安全绝缘。请选择合适组合。', code:'本关目标 K4', objective:'区分导体与绝缘体，并根据用途选择材料。', question:'哪组材料最适合？', guide:'金属常用于导电连接，塑料和橡胶常用于安全隔离。', icon:'🧰', options:[['内部塑料，外层铜片','内芯不能有效导电，外层也不安全。'],['内部铜丝，外层橡胶','铜丝导电，橡胶将手与电路隔开。'],['内部木棒，外层铁片','木棒不适合作导电内芯。']], answer:1, success:'安全维修完成！铜丝负责导电，橡胶外层保护使用者。', error:'材料的位置需要同时满足“内部导电、外层绝缘”。', hints:['分别考虑内部和手握处需要什么功能。','铜、铁等金属通常容易导电；橡胶、塑料通常不容易导电。','选择内部铜丝、外层橡胶的组合。'] }
+    ];
+    let missionIndex = 0, hintLevel = 0, totalAttempts = 0, totalHints = 0, solved = false;
+    const gameEvents = [];
+    const logEvent = (type, detail={}) => { const event={type,mission:missionIndex+1,time:new Date().toISOString(),...detail}; gameEvents.push(event); localStorage.setItem('science-game-events',JSON.stringify(gameEvents)); };
+    const renderMission = () => {
+      const mission=missions[missionIndex]; hintLevel=0; solved=false;
+      document.querySelector('#missionLabel').textContent=mission.label;
+      document.querySelector('#missionTitle').textContent=mission.title;
+      document.querySelector('#missionStory').textContent=mission.story;
+      document.querySelector('#objectiveCode').textContent=mission.code;
+      document.querySelector('#objectiveText').textContent=mission.objective;
+      document.querySelector('#questionTitle').textContent=mission.question;
+      document.querySelector('#questionText').textContent=mission.guide;
+      document.querySelector('#progressText').textContent=`${missionIndex+1} / ${missions.length}`;
+      document.querySelector('#progressBar').style.width=`${(missionIndex+1)/missions.length*100}%`;
+      document.querySelector('#feedback').className='feedback';
+      document.querySelector('#feedback').textContent='请选择一种方案。系统会记录首次选择、尝试次数和提示使用情况。';
+      document.querySelector('#hintBox').classList.remove('show');
+      document.querySelector('#hintBtn').textContent='🤖 请求机器人提示';
+      document.querySelector('#nextBtn').classList.remove('show');
+      document.querySelector('#nextBtn').textContent=missionIndex===missions.length-1?'查看任务结果 →':'进入下一关 →';
+      document.querySelector('#choices').innerHTML=mission.options.map((option,index)=>`<button class="choice" data-index="${index}"><div class="circuit" aria-hidden="true" style="font-size:46px">${mission.icon}</div><strong>${String.fromCharCode(65+index)}　${option[0]}</strong><p>${option[1]}</p></button>`).join('');
+      document.querySelectorAll('.choice').forEach(choice=>choice.addEventListener('click',()=>checkAnswer(Number(choice.dataset.index))));
+      logEvent('mission_start',{objective:mission.code});
+    };
+    const checkAnswer = (index) => {
+      if(solved) return; totalAttempts+=1; const mission=missions[missionIndex]; const correct=index===mission.answer;
+      logEvent('answer',{choice:index,correct,attempt:totalAttempts});
+      const feedback=document.querySelector('#feedback');
+      if(correct){ solved=true; feedback.className='feedback ok'; feedback.innerHTML=`<strong>${mission.success}</strong>`; document.querySelector('#nextBtn').classList.add('show'); }
+      else { feedback.className='feedback bad'; feedback.innerHTML=`<strong>再检查一次。</strong>　${mission.error}`; }
+    };
+    document.querySelector('#hintBtn').addEventListener('click',()=>{ const mission=missions[missionIndex]; const box=document.querySelector('#hintBox'); box.textContent=`第${['一','二','三'][Math.min(hintLevel,2)]}级提示：${mission.hints[Math.min(hintLevel,2)]}`; box.classList.add('show'); if(hintLevel<3){hintLevel+=1;totalHints+=1;logEvent('hint',{level:hintLevel});} document.querySelector('#hintBtn').textContent=hintLevel>=3?'🤖 已查看全部提示':'🤖 再给我一个提示'; });
+    document.querySelector('#nextBtn').addEventListener('click',()=>{ if(missionIndex<missions.length-1){missionIndex+=1;renderMission();} else { document.querySelector('#taskContent').style.display='none'; document.querySelector('#missionLabel').textContent='任务完成'; document.querySelector('#missionTitle').textContent='城市恢复供电'; document.querySelector('#missionStory').textContent='你已经完成四项电路维修任务。'; document.querySelector('#hintBtn').style.display='none'; document.querySelector('#resultCard').classList.add('show'); document.querySelector('#attemptStat').textContent=`尝试 ${totalAttempts} 次`; document.querySelector('#hintStat').textContent=`提示 ${totalHints} 次`; logEvent('game_complete',{attempts:totalAttempts,hints:totalHints}); }});
+    document.querySelector('#restartBtn').addEventListener('click',()=>{missionIndex=0;totalAttempts=0;totalHints=0;document.querySelector('#taskContent').style.display='block';document.querySelector('#hintBtn').style.display='block';document.querySelector('#resultCard').classList.remove('show');renderMission();});
+    renderMission();
+    */
+
+    const gameMissions = [
+      {label:'任务 01 · 医院急救电源',title:'搭建备用照明电路',story:'急诊室主照明失效了。请把元件装到维修板上，再亲手连接成闭合电路。',code:'本关目标 K1',objective:'通过实际搭建判断怎样形成完整的闭合电路。',hints:['先把电池、灯泡、闭合开关和导线放到各自功能位置。','每个橙色接线柱都应与另外两个元件形成连续通路。','四个接线柱需要首尾相连，每个接线柱恰好连接两条线。']},
+      {label:'任务 02 · 图书馆支援',title:'排查断路故障',story:'相同的备用灯在图书馆没有亮。观察场景，检查三个可能的故障位置。',code:'本关目标 K2',objective:'利用“电池和灯泡完好”的证据定位接触不良。',hints:['先排除已经确认完好的灯泡和电池。','观察维修机器人附近的电气面板。','左侧面板的接线处有一个松动连接。']},
+      {label:'任务 03 · 走廊照明',title:'安装控制开关',story:'走廊灯需要能够随时接通和断开。把合适的开关拖进电路缺口并测试。',code:'本关目标 K3',objective:'理解开关必须接入电路，才能控制电路通断。',hints:['开关要成为电流通路的一部分。','闭合开关会接通电路，断开开关会切断电路。','把“闭合开关”拖到电路缺口，然后进行测试。']},
+      {label:'任务 04 · 安全维修',title:'制作安全测试笔',story:'测试笔内部要导电，手握处要绝缘。把材料拖到正确的结构位置。',code:'本关目标 K4',objective:'根据导电性和安全用途选择导体与绝缘体。',hints:['先分别判断内部和手握处的功能。','金属通常容易导电，橡胶和塑料通常不容易导电。','内部使用铜丝，手握外层使用橡胶。']}
+    ];
+    let currentMission=0, selectedTool=null, hintStep=0, attempts=0, hintsUsed=0;
+    const recordedEvents=[];
+    const stage=document.querySelector('#interactiveStage');
+    const bench=document.querySelector('#workbench');
+    const record=(type,detail={})=>{const item={type,mission:currentMission+1,time:new Date().toISOString(),...detail};recordedEvents.push(item);localStorage.setItem('science-game-events',JSON.stringify(recordedEvents));};
+    const setMessage=(text,type='')=>{const el=document.querySelector('#gameMessage');if(el){el.className=`game-message ${type}`;el.innerHTML=text;}};
+    const missionComplete=(message)=>{record('mission_complete',{attempts,hintsUsed});setMessage(`<strong>${message}</strong>`,'ok');const actions=document.querySelector('#missionActions');if(actions)actions.innerHTML=`<button class="test-power" id="continueMission">${currentMission===3?'查看任务结果':'前往下一处任务 →'}</button>`;document.querySelector('#continueMission').addEventListener('click',()=>{if(currentMission<3){currentMission+=1;renderInteractiveMission();}else renderFinalResult();});};
+    const setupDrag=(acceptHandler)=>{
+      document.querySelectorAll('.tool').forEach(tool=>{tool.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',tool.dataset.tool);selectedTool=tool.dataset.tool;});tool.addEventListener('click',()=>{selectedTool=tool.dataset.tool;document.querySelectorAll('.tool').forEach(x=>x.style.borderColor='transparent');tool.style.borderColor='#2764d9';setMessage(`已拿起“${tool.textContent.trim()}”，请点击合适的位置。`);});});
+      document.querySelectorAll('[data-drop]').forEach(zone=>{zone.addEventListener('dragover',e=>e.preventDefault());zone.addEventListener('drop',e=>{e.preventDefault();acceptHandler(zone,e.dataTransfer.getData('text/plain'));});zone.addEventListener('click',()=>{if(selectedTool)acceptHandler(zone,selectedTool);});});
+    };
+    const updateSidebar=()=>{const m=gameMissions[currentMission];document.querySelector('#missionLabel').textContent=m.label;document.querySelector('#missionTitle').textContent=m.title;document.querySelector('#missionStory').textContent=m.story;document.querySelector('#objectiveCode').textContent=m.code;document.querySelector('#objectiveText').textContent=m.objective;document.querySelector('#progressText').textContent=`${currentMission+1} / 4`;document.querySelector('#progressBar').style.width=`${(currentMission+1)*25}%`;document.querySelector('#hintBox').classList.remove('show');document.querySelector('#hintBtn').textContent='🤖 请求机器人提示';hintStep=0;stage.classList.remove('powered');document.querySelector('#sceneStatusText').textContent='急诊室主照明：未恢复';};
+    const renderBuildCircuit=()=>{
+      bench.innerHTML=`<div class="workbench-head"><div><h3>维修板：搭建并连接电路</h3><p>拖拽或点选元件，把它们放到对应功能位置；然后点击两个接线柱来连接导线。</p></div><span>步骤 1/2</span></div><div class="toolbox"><button class="tool" draggable="true" data-tool="battery">🔋 电池</button><button class="tool" draggable="true" data-tool="lamp">💡 灯泡</button><button class="tool" draggable="true" data-tool="closed-switch">🎚️ 闭合开关</button><button class="tool" draggable="true" data-tool="wire">〰️ 导线</button><button class="tool" draggable="true" data-tool="wood">🪵 木棒</button><button class="tool" draggable="true" data-tool="open-switch">⛔ 断开开关</button></div><div class="circuit-board" id="circuitBoard"><svg class="wire-layer" id="wireLayer"></svg><button class="drop-slot slot-source" data-drop data-accept="battery">电源位置</button><button class="drop-slot slot-control" data-drop data-accept="closed-switch">控制位置</button><button class="drop-slot slot-light" data-drop data-accept="lamp">照明位置</button><button class="drop-slot slot-path" data-drop data-accept="wire">导线位置</button><button class="terminal t0" data-node="0" aria-label="接线柱一"></button><button class="terminal t1" data-node="1" aria-label="接线柱二"></button><button class="terminal t2" data-node="2" aria-label="接线柱三"></button><button class="terminal t3" data-node="3" aria-label="接线柱四"></button></div><div class="bench-actions" id="missionActions"><button class="reset-wire" id="resetWire">清除接线</button><button class="test-power" id="testPower">测试通电</button></div><div class="game-message" id="gameMessage">先完成元件安装，再让四个接线柱形成一个没有断点的回路。</div>`;
+      const placed=new Set(), edges=[];let startNode=null;
+      const names={battery:'🔋 电池',lamp:'💡 灯泡','closed-switch':'🎚️ 闭合开关',wire:'〰️ 导线'};
+      setupDrag((zone,tool)=>{attempts+=1;record('component_drop',{tool,slot:zone.dataset.accept});if(tool===zone.dataset.accept){zone.textContent=names[tool];zone.classList.add('filled');placed.add(tool);document.querySelector(`.tool[data-tool="${tool}"]`).classList.add('used');selectedTool=null;setMessage('元件安装正确。继续完成其余位置。','ok');}else setMessage('这个元件在这里不能完成所需功能。观察位置名称后再试一次。','bad');});
+      const coords=[[29,49],[50,31],[71,49],[50,70]];
+      const draw=()=>{document.querySelector('#wireLayer').innerHTML=edges.map(([a,b])=>`<line x1="${coords[a][0]}%" y1="${coords[a][1]}%" x2="${coords[b][0]}%" y2="${coords[b][1]}%"></line>`).join('');};
+      document.querySelectorAll('.terminal').forEach(node=>node.addEventListener('click',()=>{const n=Number(node.dataset.node);if(startNode===null){startNode=n;node.classList.add('selected');setMessage('已选择一个接线柱，再选择另一个接线柱完成连接。');}else{document.querySelectorAll('.terminal').forEach(x=>x.classList.remove('selected'));if(n!==startNode&&!edges.some(e=>e.includes(n)&&e.includes(startNode))){edges.push([startNode,n]);record('wire_connect',{from:startNode,to:n});draw();}startNode=null;}}));
+      document.querySelector('#resetWire').addEventListener('click',()=>{edges.length=0;draw();setMessage('接线已清除，可以重新连接。');});
+      document.querySelector('#testPower').addEventListener('click',()=>{attempts+=1;record('power_test',{placed:[...placed],edges});if(placed.size<4){setMessage('还有元件没有安装完成，电路无法工作。','bad');return;}const degree=[0,0,0,0];edges.forEach(([a,b])=>{degree[a]++;degree[b]++;});if(edges.length===4&&degree.every(x=>x===2)){stage.classList.add('powered');document.querySelector('#sceneStatusText').textContent='急诊室主照明：已恢复';missionComplete('通电成功！你搭建的闭合电路让急诊室重新亮了起来。');}else setMessage('电路没有形成完整回路。检查每个接线柱是否都连接了两条通路。','bad');});
+    };
+    const renderFaultMission=()=>{bench.innerHTML=`<div class="workbench-head"><div><h3>故障扫描器</h3><p>场景中有三个闪烁检查点。点击检查，利用已知信息排除错误位置。</p></div><span>观察与排查</span></div><div class="game-message" id="gameMessage">已知灯泡和电池完好，请寻找可能造成断路的连接位置。</div><div class="bench-actions" id="missionActions"></div>`;stage.insertAdjacentHTML('beforeend','<button class="hotspot correct" data-fault="joint" aria-label="检查电气面板接头">1</button><button class="hotspot wrong-a" data-fault="lamp" aria-label="检查灯具">2</button><button class="hotspot wrong-b" data-fault="battery" aria-label="检查备用电池">3</button>');document.querySelectorAll('.hotspot').forEach(h=>h.addEventListener('click',()=>{attempts+=1;record('fault_inspect',{target:h.dataset.fault});if(h.dataset.fault==='joint'){h.style.background='#42c98a';document.querySelectorAll('.hotspot').forEach(x=>x.disabled=true);missionComplete('你发现了松动的接头。重新连接后，电流通路恢复完整。');}else setMessage(h.dataset.fault==='lamp'?'灯泡已经检测完好，不需要更换。继续利用证据排查。':'备用电池电量正常。问题可能发生在连接通路上。','bad');}));};
+    const renderSwitchMission=()=>{bench.innerHTML=`<div class="workbench-head"><div><h3>走廊灯控制器</h3><p>把能够接通电路的元件拖入缺口，然后测试开与关。</p></div><span>控制电路</span></div><div class="toolbox"><button class="tool" draggable="true" data-tool="open-switch">⛔ 断开开关</button><button class="tool" draggable="true" data-tool="closed-switch">🎚️ 闭合开关</button><button class="tool" draggable="true" data-tool="wood">🪵 木棒</button></div><div class="material-zone" data-drop data-accept="closed-switch" id="switchGap">电路缺口：拖入控制元件</div><div class="game-message" id="gameMessage">选择能让当前电路接通的开关状态。</div><div class="bench-actions" id="missionActions"><button class="test-power" id="switchTest">测试走廊灯</button></div>`;let installed=false;setupDrag((zone,tool)=>{attempts+=1;record('switch_install',{tool});if(tool==='closed-switch'){installed=true;zone.textContent='🎚️ 闭合开关已接入电路';zone.classList.add('has-item');setMessage('开关已接入电路，现在进行通电测试。','ok');}else setMessage(tool==='open-switch'?'断开的开关会切断电路。试着选择能接通电路的状态。':'木棒不能作为控制电路通断的开关。','bad');});document.querySelector('#switchTest').addEventListener('click',()=>{attempts+=1;if(installed){stage.classList.add('powered');document.querySelector('#sceneStatusText').textContent='走廊照明：可控制';missionComplete('测试成功！开关接入电路后能够控制灯的亮与灭。');}else setMessage('电路缺口还没有安装正确的控制元件。','bad');});};
+    const renderMaterialMission=()=>{bench.innerHTML=`<div class="workbench-head"><div><h3>安全测试笔装配台</h3><p>分别为内部导电芯和手握保护层选择材料。</p></div><span>材料与安全</span></div><div class="toolbox"><button class="tool" draggable="true" data-tool="copper">🟠 铜丝</button><button class="tool" draggable="true" data-tool="rubber">⚫ 橡胶</button><button class="tool" draggable="true" data-tool="wood">🪵 木条</button><button class="tool" draggable="true" data-tool="aluminum">⚪ 铝片</button></div><div class="material-zones"><div class="material-zone" data-drop data-accept="copper">测试笔内部导电芯</div><div class="material-zone" data-drop data-accept="rubber">手握处保护外层</div></div><div class="game-message" id="gameMessage">内部需要让电流通过，手握处需要阻止电流接触人体。</div><div class="bench-actions" id="missionActions"><button class="test-power" id="materialTest">进行安全检测</button></div>`;const placed=new Set();setupDrag((zone,tool)=>{attempts+=1;record('material_place',{tool,target:zone.dataset.accept});if(tool===zone.dataset.accept){placed.add(tool);zone.textContent=tool==='copper'?'🟠 铜丝：负责导电':'⚫ 橡胶：负责绝缘保护';zone.classList.add('has-item');document.querySelector(`.tool[data-tool="${tool}"]`).classList.add('used');selectedTool=null;setMessage('这个材料和位置的功能匹配。','ok');}else setMessage(zone.dataset.accept==='copper'?'内部导电芯需要选择容易导电的合适金属。':'手握处需要不容易导电且适合包裹的材料。','bad');});document.querySelector('#materialTest').addEventListener('click',()=>{attempts+=1;if(placed.size===2)missionComplete('安全检测通过！铜丝传导电流，橡胶外层保护使用者。');else setMessage('测试笔还没有装配完成，请检查两个位置。','bad');});};
+    const renderFinalResult=()=>{document.querySelectorAll('.hotspot').forEach(x=>x.remove());stage.classList.add('powered');document.querySelector('#sceneStatusText').textContent='医院供电任务：全部完成';bench.innerHTML=`<div class="result-card show"><div class="result-icon">🏥✨</div><h2>医院供电恢复</h2><p>你通过搭建、排查、控制和材料选择完成了四项真实维修任务。</p><div class="result-stats"><span>操作尝试 ${attempts} 次</span><span>使用提示 ${hintsUsed} 次</span><span>完成 4 个学习目标</span></div><button class="play-btn" id="restartInteractive">重新挑战</button></div>`;record('game_complete',{attempts,hintsUsed});document.querySelector('#restartInteractive').addEventListener('click',()=>{currentMission=0;attempts=0;hintsUsed=0;renderInteractiveMission();});};
+    const renderInteractiveMission=()=>{document.querySelectorAll('.hotspot').forEach(x=>x.remove());updateSidebar();record('mission_start',{objective:gameMissions[currentMission].code});[renderBuildCircuit,renderFaultMission,renderSwitchMission,renderMaterialMission][currentMission]();};
+    document.querySelector('#hintBtn').replaceWith(document.querySelector('#hintBtn').cloneNode(true));
+    document.querySelector('#hintBtn').addEventListener('click',()=>{const m=gameMissions[currentMission],box=document.querySelector('#hintBox');box.textContent=`第${['一','二','三'][Math.min(hintStep,2)]}级提示：${m.hints[Math.min(hintStep,2)]}`;box.classList.add('show');if(hintStep<3){hintStep+=1;hintsUsed+=1;record('hint',{level:hintStep});}document.querySelector('#hintBtn').textContent=hintStep>=3?'🤖 已查看全部提示':'🤖 再给我一个提示';});
+    renderInteractiveMission();
+  </script>
+</body>
+</html>

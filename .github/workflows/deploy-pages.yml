@@ -1,19 +1,15 @@
 name: Deploy game demo to GitHub Pages
-
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
 concurrency:
   group: pages
   cancel-in-progress: true
-
 jobs:
   deploy:
     environment:
@@ -23,12 +19,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify classroom game
+        working-directory: web-classroom-game
+        run: npm test
+      - name: Prepare preview
+        run: node scripts/build-preview.mjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload playable site
         uses: actions/upload-pages-artifact@v4
         with:
-          path: web-demo/dist
+          path: public-preview
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
