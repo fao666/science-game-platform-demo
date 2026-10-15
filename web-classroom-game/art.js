@@ -61,3 +61,12 @@ export function drawLead(ctx,a,b,color='#b85f4e',width=7){
   ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(...a);ctx.quadraticCurveTo(cx,cy,...b);ctx.stroke();
   ctx.globalAlpha=.35;ctx.strokeStyle='#fff7dd';ctx.lineWidth=2;ctx.stroke();ctx.restore();
 }
+
+// Render only the removable glass bulb and screw cap; the yellow holder stays put.
+export function drawLooseBulb(ctx,x,y,size=1){
+  if(!parts.complete||!parts.naturalWidth)return;
+  const cell=parts.naturalWidth/3;
+  ctx.save();ctx.translate(x,y);ctx.scale(.2564*size,.2564*size);
+  ctx.beginPath();ctx.ellipse(0,0,93,89,0,0,Math.PI*2);ctx.rect(-65,60,130,118);ctx.clip();
+  ctx.drawImage(parts,cell+270,125,210,280,-103,-94,210,280);ctx.restore();
+}
