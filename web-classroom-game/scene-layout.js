@@ -2,10 +2,10 @@
 export const fairResidents=[
   {id:'stall',x:1050,y:375,label:'阿圆 · 摊位负责人',sprite:0,size:152},
   {id:'mentor',x:360,y:430,label:'羽老师 · 科学指导',sprite:1,size:150},
-  {id:'rabbit',x:810,y:570,label:'米米 · 作品制作者',sprite:2,size:152},
+  {id:'rabbit',x:810,y:570,label:'米米 · 灯塔制作者',sprite:2,size:152},
   {id:'organizer',x:1070,y:650,label:'小栗 · 活动志愿者',sprite:0,size:148,extra:true},
-  {id:'hedgehog',x:170,y:650,label:'团团 · 风车同学',sprite:2,size:136,extra:true},
-  {id:'turtle',x:750,y:245,label:'慢慢 · 长椅上的同学',sprite:3,size:105,extra:true}
+  {id:'hedgehog',x:170,y:650,label:'团团 · 星星舞台制作者',sprite:2,size:136,extra:true},
+  {id:'turtle',x:750,y:245,label:'慢慢 · 纸屋制作者',sprite:3,size:105,extra:true}
 ];
 export const workshopSpots=[
   {id:'bench',x:795,y:405,label:'模型实验桌'},

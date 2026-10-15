@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {bulbGlass,lampDropMatches} from '../lamp-geometry.js';
+test('光效中心与图片玻璃罩共用变换，缩放保持比例',()=>{const a=bulbGlass(0,0,166,145),b=bulbGlass(0,0,332,290);assert.equal(b.x,a.x*2);assert.equal(b.y,a.y*2);assert.equal(b.rx,a.rx*2);assert.ok(a.rx>23&&a.rx<25);});
+for(const mirrored of [false,true])test('替换只接受玻璃与螺口，不接受底座或接点 mirror='+mirrored,()=>{const a=[mirrored?370:760,240],b=[mirrored?255:875,240],mid=(a[0]+b[0])/2,g=bulbGlass(mid-83,142,166,145);assert.equal(lampDropMatches({x:g.x,y:g.y},a,b),true);assert.equal(lampDropMatches({x:g.x,y:g.y+40},a,b),true);assert.equal(lampDropMatches({x:mid,y:275},a,b),false);assert.equal(lampDropMatches({x:a[0],y:a[1]},a,b),false);});
