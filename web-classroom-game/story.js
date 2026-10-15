@@ -32,5 +32,7 @@ export function renderSummary(box,s){
     add(article,'p','我的判断：'+(names[r.target]||'还不确定具体原因'));
     if(r.feedback)add(article,'p',r.feedback,'summary-feedback');
   });
-  if(!s.reports.length)add(box,'p','还没有交还作品。羽老师会在这里保留你完成后的记录。');
+  const pending=Array.isArray(s.investigations)?s.investigations.map((entry,index)=>({entry,index})).filter(({entry,index})=>!s.reports.some(r=>r.index===index)&&(entry.accepted||entry.carrying||entry.current?.evidence?.length||entry.current?.reportDraft)):[];
+  pending.forEach(({entry,index})=>{const c=entry.current,article=document.createElement('article');article.className='summary-case';box.append(article);add(article,'h3','未交付的调查 · '+cases[index].title);add(article,'p','阶段：'+(c.verified?'已通电点亮':c.fixed.length?'已调整，尚待复验':'调查中'));const list=document.createElement('ol');article.append(list);(c.evidence||[]).forEach(e=>add(list,'li',(names[e.target]||e.target)+' · '+(e.afterRepair?'调整后':'调整前')+'：检测器的灯'+(e.lit?'亮':'不亮')));add(article,'p','修复操作：'+((c.fixed||[]).map(k=>names[k]||k).join('、')||'暂无'));if(c.report?.reason||c.reportDraft?.reason)add(article,'p','报告或草稿：'+(c.report?.reason||c.reportDraft.reason),'student-report');});
+  if(!s.reports.length&&!pending.length)add(box,'p','还没有交还作品。羽老师会在这里保留你完成后的记录。');
 }
