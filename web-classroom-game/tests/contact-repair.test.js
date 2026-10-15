@@ -11,7 +11,7 @@ test('未夹到接线柱不修复，正确夹紧只记录一次',()=>{
  let repairs=0;try{
  openContactRepair({openDialog(){},onRepair(){repairs++;},drawPart(){},drawLead(){}});
  const e=(x,y)=>({clientX:x,clientY:y,pointerId:1});
- canvas.onpointerdown(e(130,310));canvas.onpointerup(e(200,310));assert.equal(repairs,0);
+ canvas.onpointerdown(e(130,310));canvas.onpointermove(e(180,310));canvas.onpointerup(e(180,310));assert.equal(repairs,0);
  canvas.onpointerdown(e(180,310));canvas.onpointermove(e(376,229));canvas.onpointerup(e(376,229));assert.equal(repairs,1);assert.match(status.textContent,/放回电池/);
  canvas.onpointerdown(e(376,229));canvas.onpointerup(e(376,229));assert.equal(repairs,1);
  }finally{delete globalThis.document;}

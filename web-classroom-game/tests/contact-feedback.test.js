@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {openContactRepair} from '../contact-repair.js';
+function setup(options={}){const ctx=new Proxy({},{get:()=>()=>{},set:()=>true}),canvas={getContext:()=>ctx,getBoundingClientRect:()=>({left:0,top:0,width:760,height:420}),setPointerCapture(){}},status={},close={};let repairs=0;globalThis.document={querySelector:s=>s==='#contactRepairCanvas'?canvas:s==='#contactRepairStatus'?status:close};openContactRepair({openDialog(){},onRepair(){repairs++;},drawPart(){},drawLead(){},...options});return {canvas,status,count:()=>repairs};}
+const e=(x,y)=>({clientX:x,clientY:y,pointerId:1});
+test('仅松开指针不能跨过拖动过程直接完成',()=>{try{const t=setup();t.canvas.onpointerdown(e(150,310));t.canvas.onpointerup(e(376,229));assert.equal(t.count(),0);}finally{delete globalThis.document;}});
+test('已调整的接头再次查看保留夹紧状态，不重复记为修复',()=>{try{const t=setup({alreadyConnected:true});assert.match(t.status.textContent,/已夹紧/);t.canvas.onpointerdown(e(150,310));t.canvas.onpointermove(e(376,229));t.canvas.onpointerup(e(376,229));assert.equal(t.count(),0);}finally{delete globalThis.document;}});
