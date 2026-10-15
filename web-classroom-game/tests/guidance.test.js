@@ -10,7 +10,8 @@ test('接任务、取作品、制作工具和调查都有明确去处',()=>{
   assert.equal(guideFor(s,'workshop').target,'tool');
   s.toolReady=true;assert.equal(guideFor(s,'workshop').target,'bench');
   assert.match(guideFor(s,'bench').title,/电池/);
-  s.current.power=false;assert.match(guideFor(s,'bench').title,/工具/);
+  s.current.power=false;assert.match(guideFor(s,'bench').title,/选一个/);
+  s.toolReady=false;assert.match(guideFor(s,'bench').title,/首次自检/);s.toolReady=true;
   assert.match(guideFor(s,'bench',true).title,/选一个/);
 });
 test('已修复后引导写报告、离开桌面和交还，而不泄漏故障答案',()=>{

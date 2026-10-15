@@ -6,4 +6,4 @@ function press(x,y){
   c.canvas.handler({x,y,pointerId:1});return c.drag;
 }
 test('开关上的接点优先用于接线，不被拆开关手势挡住',()=>{assert.equal(press(610,450)?.kind,'wire');assert.equal(press(735,450)?.kind,'wire');});
-test('开关中部仍可抓取用于拆卸',()=>assert.equal(press(680,425)?.kind,'switch'));
+test('不再要求抓取开关并拖入托盘，普通接点仍可自由连接',()=>assert.equal(press(680,425),null));
