@@ -1,3 +1,4 @@
+const holders=new Image();holders.src='assets/battery-holder-v5.png';
 const crafts=new Image();crafts.src='assets/craft-models-v3.png';
 const parts=new Image();parts.src='assets/circuit-parts-v4.png';
 const students=new Image();students.src='assets/students-v3.png';
@@ -9,17 +10,20 @@ export function drawCraft(ctx,index,x,y,w,h){
   ctx.drawImage(crafts,index*cell,0,cell,crafts.naturalHeight,x,y,w,h);
 }
 export function drawPart(ctx,kind,x,y,w,h){
+  if(kind==='battery'||kind==='emptyBattery'){
+    if(!holders.complete||!holders.naturalWidth)return;
+    const center=kind==='battery'?617:1157,scale=h/790;
+    ctx.save();ctx.translate(x+w/2,y);ctx.scale(scale,scale);
+    ctx.drawImage(holders,center-125,0,250,887,-125,-44,250,887);ctx.restore();return;
+  }
   if(kind==='wire'){
     if(leads.complete&&leads.naturalWidth)ctx.drawImage(leads,0,0,leads.naturalWidth,leads.naturalHeight/2,x,y,w,h);
     return;
   }
   if(!parts.complete||!parts.naturalWidth)return;
   const cell=parts.naturalWidth/3;
-  if(kind==='battery'){
-    // Rotate and scale the real holder so its two physical posts match the ports.
-    spriteBetween(ctx,0,0,cell,parts.naturalHeight,[164,100],[660,517],[x+w/2,y],[x+w/2,y+h]);
-  }else if(kind==='bulb'){
-    spriteBetween(ctx,cell,0,cell,parts.naturalHeight,[158,425],[606,425],[x+w*.154,y+h*.676],[x+w*.846,y+h*.676]);
+  if(kind==='bulb'){
+    spriteBetween(ctx,cell+85,0,cell-85,parts.naturalHeight,[73,425],[521,425],[x+w*.154,y+h*.676],[x+w*.846,y+h*.676]);
   }else if(kind==='switch')drawSwitch(ctx,[x+w*.15,y+h*.68],[x+w*.85,y+h*.68],true);
 }
 
@@ -51,7 +55,7 @@ export function drawStudent(ctx,avatar,x,y,w,h){
 
 export function drawLead(ctx,a,b,color='#b85f4e',width=7){
   const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1;
-  const bend=Math.min(65,len*.24),cx=(a[0]+b[0])/2-dy/len*bend,cy=(a[1]+b[1])/2+dx/len*bend;
+  const bend=Math.min(28,len*.09),cx=(a[0]+b[0])/2-dy/len*bend,cy=(a[1]+b[1])/2+dx/len*bend;
   ctx.save();ctx.lineCap='round';ctx.strokeStyle='#5c49362b';ctx.lineWidth=width+3;
   ctx.beginPath();ctx.moveTo(a[0],a[1]+3);ctx.quadraticCurveTo(cx,cy+3,b[0],b[1]+3);ctx.stroke();
   ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(...a);ctx.quadraticCurveTo(cx,cy,...b);ctx.stroke();
