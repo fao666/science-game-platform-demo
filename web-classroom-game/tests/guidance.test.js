@@ -4,7 +4,7 @@ import {newCase} from '../core.js';
 import {guideFor,nearDoor} from '../guidance.js';
 const state=()=>({index:0,current:newCase(0),reports:[],toolEdges:[],accepted:false,carrying:false,toolReady:false,removed:false});
 test('接任务、取作品、制作工具和调查都有明确去处',()=>{
-  const s=state();assert.equal(guideFor(s,'fair').target,'stall');
+  const s=state();assert.equal(guideFor(s,'fair').target,'rabbit');
   s.accepted=true;assert.match(guideFor(s,'fair').title,/拿起/);
   s.carrying=true;assert.equal(guideFor(s,'fair').target,'door');
   assert.equal(guideFor(s,'workshop').target,'tool');

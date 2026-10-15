@@ -1,17 +1,19 @@
-import {toolLit} from './core.js';
+import {questOwners} from './story.js';
+import {cases,toolLit} from './core.js';
 
 // Describe the next action without revealing the faulty part.
 export function guideFor(s,scene,ready=false){
   const c=s.current;
   const guide=(step,title,detail,target=null,action=null)=>({step,title,detail,target,action});
-  if(s.completed)return guide(4,'三件作品都亮了！','打开调查本，比较三次修复的发现，再和同学交流。',null,'summary');
+  if(s.completed){if(scene==='fair')return guide(4,'三件作品都亮了，找羽老师交流','羽老师会和你比较三次实验，并呈现检测记录和提交的报告。','mentor');if(scene==='workshop')return guide(4,'回游园会参加亮灯展示','从工坊左侧门出去，和同学们一起欣赏作品。','door');return guide(4,'离开工作台，参加亮灯展示','三份记录已经保存，回游园会找羽老师。',null,'leave');}
   if(!s.accepted||!s.carrying){
-    if(scene==='workshop')return guide(0,'先回游园会领取作品','从左侧门出去，到右上方红白帐篷找阿圆。','door');
-    if(scene!=='fair')return guide(0,'先回游园会领取作品','先离开工作台，从工坊左侧门出去找阿圆。',null,'leave');
-    return !s.accepted?guide(0,'先问问摊位的阿圆','到右上方红白帐篷，靠近水豚同学按 E，或直接点击同学。','stall'):guide(0,'拿起这次要修的作品','再和阿圆互动一次。三件作品会依次交给你，不用同时搬走。','stall');
+    const q=questOwners[s.index];
+    if(scene==='workshop')return guide(0,'回游园会找'+q.name,q.place+'的'+q.name+'有一件作品需要你调查。','door');
+    if(scene!=='fair')return guide(0,'先找制作者领取作品','先离开工作台，回游园会听听'+q.name+'的求助。',null,'leave');
+    return guide(0,s.accepted?'拿起这次要修的作品':'听听'+q.name+'的求助',q.place+' · '+cases[s.index].title+'。这是推荐去处，也可点击任意任务卡，自由选择先帮助谁。',q.id);
   }
   if(c.report&&c.verified){
-    if(scene==='fair')return guide(4,'把修好的作品交还阿圆','到右上方红白帐篷互动，交还后会接到下一件作品。','stall');
+    if(scene==='fair')return guide(4,'把修好的作品交还阿圆','到右上方红白帐篷互动，阿圆负责统一验收作品和报告，再指引你去找下一位同学。','stall');
     if(scene==='workshop')return guide(4,'从左侧门回游园会','走进门口的发光区域就会自动离开工坊。','door');
     return guide(4,'带上作品回游园会','先离开工作台，再从工坊左侧的门出去。',null,'leave');
   }

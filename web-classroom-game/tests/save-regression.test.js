@@ -27,3 +27,5 @@ test('无效进度不会导致启动白屏，原始内容留作恢复备份',()=
     assert.equal(storage.get('otter-classroom-v1-recovery'),raw);
   }
 });
+
+test('旧版已完成进度保留三份报告，默认仍能重新进入庆祝展示',()=>{const reports=[0,1,2].map(index=>({index,reason:'报告'+index}));const raw={index:2,current:newCase(2),reports,events:[],toolEdges:[],completed:true,accepted:true,carrying:true};const {state}=load(JSON.stringify(raw));assert.equal(state.completed,true);assert.equal(state.celebrating,false);assert.equal(state.reports.length,3);assert.equal(state.reports[1].reason,'报告1');});
