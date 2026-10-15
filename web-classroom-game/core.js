@@ -12,7 +12,7 @@ export function assessReport(c,ids,target){
   const records=ids.length?c.evidence.filter(e=>ids.includes(e.id)):c.evidence;
   const before=records.some(e=>e.target===target&&!e.lit&&!e.afterRepair);
   const after=records.some(e=>e.target===target&&e.lit&&e.afterRepair);
-  const supportedCause=before&&target===cases[c.index].fault&&c.fixed.includes(target);
+  const supportedCause=before&&target===cases[c.index].fault&&c.fixed.length===1&&c.fixed.includes(target);
   if(supportedCause)return {allowed:true,evidenceStatus:'supported',feedback:`作品已修复！你记录了${names[target]}调整前检测灯不亮，${after?'调整后检测灯亮起，并且':''}修复后模型也亮了，这些现象支持你的判断。正常部位的检测记录可以帮助排除其他原因，但不必凑齐才能交还作品。`};
   return {allowed:true,evidenceStatus:c.fixed.length>1?'multiple_changes':'repair_only',feedback:c.fixed.length>1?'作品已修复，可以交还同学！你调整了多个部位，暂时不能确定是哪一次调整起了作用。下次可以一次只改一处，再观察变化。':'作品已修复，可以交还同学！修复后模型亮了，能说明这次修复有效；但缺少支持原故障判断的修复前记录，还不能完全确定原来哪里出了问题。不必恢复故障补记录，下次可以先检测再调整。'};
 }
