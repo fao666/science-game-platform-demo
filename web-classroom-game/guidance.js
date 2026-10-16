@@ -22,7 +22,7 @@ export function guideFor(s,scene,ready=false){
   if(scene==='tool'){
     if(s.toolReady)return guide(1,'检测工具准备好了','离开工具台，去右侧模型实验桌调查作品。',null,'leave');
     if(s.removed)return guide(1,'首次使用前，让两个检测头碰一碰','拖动红、蓝导线末端互相接触。自己的灯亮了，才知道这个工具能用；成功后可以一直使用。');
-    if(toolLit(s.toolEdges,false))return guide(1,'灯亮了！接下来留出两个检测头','取下开关，让待检查的部件接到这个空缺处。点击右侧“取下开关，留下两个检测头”即可。',null,'prepare-tester');
+    if(toolLit(s.toolEdges,false))return guide(1,'灯亮了！接下来留出两个检测头','取下开关，让待检查的部件接到这个空缺处。点击实验桌右侧显眼的蓝色“下一步：取下开关”按钮。',null,'prepare-tester');
     return guide(1,'先确认我们自己的电路能亮','把电池、小灯泡和开关连成回路，确认这些器材能工作。可拖动接点，也可依次点击两个接点，连接顺序由你决定。');
   }
   if(c.verified)return guide(3,'模型亮了，记下你的发现','打开调查本，写下调整了什么、重新供电后看到了什么。',null,'notebook');
