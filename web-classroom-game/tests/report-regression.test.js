@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import * as core from '../core.js';
+import {synchronizeReport} from '../notebook-state.js';
 
 function submit(evidence=[],verified=true){
   const source=readFileSync(new URL('../main.js',import.meta.url),'utf8');
@@ -10,7 +11,7 @@ function submit(evidence=[],verified=true){
   const current={...core.newCase(2),fixed:['wire'],verified,evidence};
   const elements={};
   const $=key=>elements[key]??=( {value:key==='#conclusion'?'wire':key==='#reason'?'我更换导线，放回电池后模型灯亮了。':'',textContent:'',querySelectorAll:()=>[],close(){}} );
-  const context=vm.createContext({...core,s:{index:2,current},selected:new Set(),$,openDialog(){},log(){},caption(){},tone(){},download(){},JSON});
+  const context=vm.createContext({...core,synchronizeReport,s:{index:2,current},selected:new Set(),$,openDialog(){},log(){},caption(){},tone(){},download(){},JSON});
   vm.runInContext(body+';notebook();',context);
   $('#conclusion').value='wire';
   $('#reason').value='我更换导线，放回电池后模型灯亮了。';

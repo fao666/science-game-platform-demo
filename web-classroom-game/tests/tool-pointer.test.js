@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
 const source=fs.readFileSync(new URL('../main.js',import.meta.url),'utf8');
 function press(x,y){
-  const c={speech:{isOpen:()=>false},canvas:{addEventListener(_,fn){this.handler=fn;},focus(){},setPointerCapture(){}},$:()=>({hidden:true}),pointer:e=>e,scene:'tool',s:{removed:false},drag:null,toolPorts:{0:[245,225],1:[245,450],2:[610,225],3:[735,225],4:[610,450],5:[735,450]},hit:(p,x,y,w,h)=>p.x>x&&p.x<x+w&&p.y>y&&p.y<y+h};
+  const c={speech:{isOpen:()=>false},toolLit:()=>false,canvas:{addEventListener(_,fn){this.handler=fn;},focus(){},setPointerCapture(){}},$:()=>({hidden:true}),pointer:e=>e,scene:'tool',s:{removed:false},drag:null,toolPorts:{0:[245,225],1:[245,450],2:[610,225],3:[735,225],4:[610,450],5:[735,450]},hit:(p,x,y,w,h)=>p.x>x&&p.x<x+w&&p.y>y&&p.y<y+h};
   vm.runInNewContext(source.split('\n').find(l=>l.startsWith("canvas.addEventListener('pointerdown',e=>{if(!$('#welcome').hidden||speech.isOpen())return;")),c);
   c.canvas.handler({x,y,pointerId:1});return c.drag;
 }
