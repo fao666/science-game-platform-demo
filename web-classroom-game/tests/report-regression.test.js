@@ -8,7 +8,7 @@ import {synchronizeReport} from '../notebook-state.js';
 function submit(evidence=[],verified=true){
   const source=readFileSync(new URL('../main.js',import.meta.url),'utf8');
   const body=source.slice(source.indexOf('function notebook(){'),source.indexOf('function download('));
-  const current={...core.newCase(2),fixed:['wire'],verified,evidence};
+  const current={...core.newCase(2),fault:'wire',fixed:['wire'],verified,evidence};
   const elements={};
   const $=key=>elements[key]??=( {value:key==='#conclusion'?'wire':key==='#reason'?'我更换导线，放回电池后模型灯亮了。':'',textContent:'',querySelectorAll:()=>[],close(){}} );
   const context=vm.createContext({...core,synchronizeReport,s:{index:2,current},selected:new Set(),$,openDialog(){},log(){},caption(){},tone(){},download(){},JSON});

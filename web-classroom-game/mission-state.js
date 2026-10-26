@@ -4,7 +4,7 @@ export function initializeInvestigations(s){
   const previous=Array.isArray(s.investigations)?s.investigations:[];
   s.investigations=[0,1,2].map(index=>{
     const old=previous[index],base=newCase(index);
-    if(old?.current?.index===index&&['fixed','evidence','hypotheses'].every(k=>Array.isArray(old.current[k])))return {...old,current:{...base,...old.current}};
+    if(old?.current?.index===index&&['fixed','evidence','hypotheses'].every(k=>Array.isArray(old.current[k])))return {...old,current:{...base,...old.current,fault:old.current.fault||['contact','lamp','wire'][index]}};
     const report=s.reports.find(r=>r.index===index);
     return {accepted:!!report,carrying:false,current:report?{...base,fixed:report.actions||[],evidence:report.evidence||[],hypotheses:report.hypotheses||[],verified:true,report}:base};
   });

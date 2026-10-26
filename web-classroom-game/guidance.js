@@ -29,7 +29,7 @@ export function guideFor(s,scene,ready=false){
   if(c.fixed.length&&!c.power)return guide(2,'调整之后，重新供电看看','点击左上方“放回电池复验”。如果还不亮，可以继续调查，不必重来。');
   if(c.power)return guide(2,'先把作品里的电池取下来','点击左上方“取下模型电池”。检测工具自带电池，不能带着原电源检测。');
   if(!s.toolReady)return guide(2,'先完成检测器的首次自检','如果还没做工具，先回左侧制作台。让已制作工具的两个检测头互碰，确认自己的灯能亮。');
-  return guide(2,'选一个想检查的部位','把两个检测头分别拖到同一部位两端的金色接点，观察检测器自己的灯。你可以自由选择和更换检测对象，不必重复自检。');
+  return guide(2,'选一个想检查的部位','在实验桌下方选择部件，再取出部件。可点击“连接检测头”，也可把金属尖端拖到蓝圈 A、B。整根导线只测两端；电池采用换入参考电路的方法。自由选择顺序，不必重复自检。');
 }
 
 export function testerPurpose(s){

@@ -70,3 +70,11 @@ export function drawLooseBulb(ctx,x,y,size=1){
   ctx.beginPath();ctx.ellipse(0,0,93,89,0,0,Math.PI*2);ctx.rect(-65,60,130,118);ctx.clip();
   ctx.drawImage(parts,cell+270,125,210,280,-103,-94,210,280);ctx.restore();
 }
+
+export function drawLampBase(ctx,x,y,w,h){
+  if(!parts.complete||!parts.naturalWidth)return;
+  const cell=parts.naturalWidth/3,scale=w*.692/448;
+  ctx.save();ctx.translate(x+w*.154-158*scale,y+h*.676-425*scale);ctx.scale(scale,scale);
+  ctx.beginPath();ctx.rect(80,400,600,300);ctx.rect(90,320,170,200);ctx.rect(520,320,150,200);ctx.clip();
+  ctx.drawImage(parts,cell,0,cell,cell,0,0,cell,cell);ctx.restore();
+}
