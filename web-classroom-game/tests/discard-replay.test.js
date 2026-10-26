@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {discardAndReset} from '../replay.js';
+test('主动不保存重开只清本轮，历史原样保留且不追加',()=>{const m=new Map([['game','current'],['game-history','previous-history']]);discardAndReset({removeItem:k=>m.delete(k),getItem:k=>m.get(k)??null},'game');assert.equal(m.has('game'),false);assert.equal(m.get('game-history'),'previous-history');});
+test('清除失败会报错，不触碰历史',()=>{const m=new Map([['game','current'],['game-history','history']]);assert.throws(()=>discardAndReset({removeItem(){},getItem:k=>m.get(k)??null},'game'));assert.equal(m.get('game'),'current');assert.equal(m.get('game-history'),'history');});

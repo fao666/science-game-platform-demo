@@ -12,3 +12,9 @@ export function archiveAndReset(storage,key,state){
   if(storage.getItem(key+'-history')!==value)throw Error('历史记录未能保存，当前进度已保留。');
   storage.removeItem(key);return entry;
 }
+
+// Discard only when explicitly chosen; previous archived runs are never changed.
+export function discardAndReset(storage,key){
+  storage.removeItem(key);
+  if(storage.getItem(key)!==null)throw Error('本轮进度未能清除，请重试。');
+}
