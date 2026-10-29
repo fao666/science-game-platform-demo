@@ -18,3 +18,13 @@ export function discardAndReset(storage,key){
   storage.removeItem(key);
   if(storage.getItem(key)!==null)throw Error('本轮进度未能清除，请重试。');
 }
+
+export function archiveCompleted(storage,key,state){
+  if(!state.completed||![0,1,2,3].every(i=>state.reports.some(r=>r.index===i)))return null;
+  const history=readPlayHistory(storage,key),id='completed-'+state.started;
+  if(history.some(entry=>entry.id===id))return history.find(entry=>entry.id===id);
+  const entry={id,savedAt:new Date().toISOString(),state:JSON.parse(JSON.stringify(state))};
+  const value=JSON.stringify([entry,...history]);storage.setItem(key+'-history',value);
+  if(storage.getItem(key+'-history')!==value)throw Error('通关记录保存失败，请导出备份。');
+  return entry;
+}
