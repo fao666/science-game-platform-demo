@@ -41,3 +41,7 @@ body{background:radial-gradient(ellipse at 5% 0,#e0f4ff,transparent 48%),#f4f9ff
 #benchPanel{position:relative;left:auto;bottom:auto;width:auto;margin:10px 12px 12px}.stage[data-scene=bench]{background:#dcecf8}#welcome{z-index:30}#benchPanel .bench-content{display:block}#benchPanel.folded .bench-content{display:none}
 
 .returning-entry button{display:block;width:100%;margin:12px 0}.restart-options{margin:18px 0}.restart-options>button{display:block;max-width:100%}.restart-options>p{margin:8px 0 20px;color:#526d81;font-size:16px;line-height:1.65}#discardAndRestart{border-color:#b2cce2;color:#315975}#welcome .returning-entry p{font-size:16px;line-height:1.7}#welcome .returning-entry h2{font-size:23px}
+
+.craft-thumb[data-craft="3"]{background-image:none!important;background:#e4f2ff;border-radius:12px;display:grid;place-items:center}.craft-thumb[data-craft="3"]:after{content:"💡";font-size:38px}.repair-records p{padding:12px;background:#e8f2ff;border-radius:10px}
+
+@media(min-width:1001px){.craft-tasks{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:650px){.craft-tasks{grid-template-columns:repeat(2,minmax(0,1fr))}}

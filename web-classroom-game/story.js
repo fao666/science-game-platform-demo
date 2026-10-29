@@ -1,9 +1,10 @@
 import {cases,names} from './core.js';
 
 export const questOwners=[
-  {id:'rabbit',name:'米米',place:'广场右侧',role:'灯塔制作者',question:'我的寻宝灯塔昨天还能亮，今天合上开关却没有反应。灯泡、导线、连接、开关或电池都有可能，你能帮我查一查吗？'},
-  {id:'turtle',name:'慢慢',place:'上方长椅旁',role:'纸屋制作者',question:'我想让纸屋的小夜灯照亮窗户，可是装好电池、合上开关也不亮。看起来相似的现象，会是同一种原因吗？请帮我调查。'},
-  {id:'hedgehog',name:'团团',place:'左下方草坪边',role:'星星舞台制作者',question:'我的星星舞台不亮了，而且内部器材的位置和前两件不一样。你愿意带回工坊，根据检测结果找到原因吗？'}
+  {id:'rabbit',name:'米米',place:'广场右侧',role:'灯塔制作者',question:'这件作品只有一处故障。我的寻宝灯塔昨天还能亮，今天合上开关却没有反应。灯泡、导线、连接、开关或电池都有可能，你能帮我查一查吗？'},
+  {id:'turtle',name:'慢慢',place:'上方长椅旁',role:'纸屋制作者',question:'这件作品只有一处故障。我想让纸屋的小夜灯照亮窗户，可是装好电池、合上开关也不亮。看起来相似的现象，会是同一种原因吗？请帮我调查。'},
+  {id:'hedgehog',name:'团团',place:'左下方草坪边',role:'星星舞台制作者',question:'这件作品只有一处故障。我的星星舞台不亮了，而且内部器材的位置和前两件不一样。你愿意带回工坊，根据检测结果找到原因吗？'},
+  {id:'stall',name:'阿圆',place:'右上方摊位',role:'摊位负责人',question:'谢谢你修好了三位同学的作品！我的摊位欢迎灯也不亮了。这是低压电池灯，只有一处故障，能再帮我调查一次吗？'}
 ];
 export function questStatus(s,index){return s.reports.some(r=>r.index===index)?'delivered':index===s.index&&s.carrying?'investigating':s.investigations?.[index]?.carrying?'paused':'available';}
 
@@ -13,7 +14,7 @@ export function createSpeech(stage){
   const primary=root.querySelector('#speechAction'),close=root.querySelector('#speechClose'),toggle=root.querySelector('#speechToggle');let previousFocus,collapsed=false;
   const hintToggle=document.createElement('button');hintToggle.id='hintToggle';hintToggle.type='button';hintToggle.textContent='收起提示 ▾';hintToggle.setAttribute('aria-controls','caption');hintToggle.setAttribute('aria-expanded','true');stage.append(hintToggle);hintToggle.onclick=()=>{const hidden=stage.classList.toggle('hints-collapsed');hintToggle.textContent=hidden?'展开提示 ▴':'收起提示 ▾';hintToggle.setAttribute('aria-expanded',String(!hidden));};
   toggle.onclick=()=>{collapsed=!collapsed;root.classList.toggle('collapsed',collapsed);toggle.textContent=collapsed?'展开对话 ▴':'收起对话 ▾';toggle.setAttribute('aria-expanded',String(!collapsed));};
-  const api={isOpen:()=>!root.hidden&&!collapsed,close(){root.hidden=true;stage.classList.remove('speaking');if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});},show({spot,title,text,label,action,happy=false}){previousFocus=document.activeElement;collapsed=false;root.classList.remove('collapsed');toggle.textContent='收起对话 ▾';toggle.setAttribute('aria-expanded','true');const qi=questOwners.findIndex(q=>q.id===spot?.id),portrait=root.querySelector('.speaker-portrait');portrait.hidden=qi<0;portrait.style.backgroundPosition=(Math.max(qi,0)*50)+'% '+(happy?100:0)+'%';root.querySelector('small').textContent='校园游园会 · '+(spot?.label||title);root.querySelector('h2').textContent=title;root.querySelector('p').textContent=text;root.style.left=Math.min(53,Math.max(3,(spot?.x||600)/12-38))+'%';const foot=spot?.y||500,head=foot-(spot?.size||140);root.style.top=Math.min(49,Math.max(8,(head<220?foot+50:head-270)/7.6))+'%';primary.hidden=!action;primary.textContent=label||'继续';primary.onclick=()=>{api.close();action?.();};close.textContent=action?'稍后再聊':'知道了';close.onclick=api.close;root.hidden=false;stage.classList.add('speaking');(action?primary:close).focus({preventScroll:true});}};
+  const api={isOpen:()=>!root.hidden&&!collapsed,close(){root.hidden=true;stage.classList.remove('speaking');if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});},show({spot,title,text,label,action,happy=false}){previousFocus=document.activeElement;collapsed=false;root.classList.remove('collapsed');toggle.textContent='收起对话 ▾';toggle.setAttribute('aria-expanded','true');const qi=questOwners.findIndex(q=>q.id===spot?.id),portrait=root.querySelector('.speaker-portrait');portrait.hidden=qi<0||qi>=3;portrait.style.backgroundPosition=(Math.max(qi,0)*50)+'% '+(happy?100:0)+'%';root.querySelector('small').textContent='校园游园会 · '+(spot?.label||title);root.querySelector('h2').textContent=title;root.querySelector('p').textContent=text;root.style.left=Math.min(53,Math.max(3,(spot?.x||600)/12-38))+'%';const foot=spot?.y||500,head=foot-(spot?.size||140);root.style.top=Math.min(49,Math.max(8,(head<220?foot+50:head-270)/7.6))+'%';primary.hidden=!action;primary.textContent=label||'继续';primary.onclick=()=>{api.close();action?.();};close.textContent=action?'稍后再聊':'知道了';close.onclick=api.close;root.hidden=false;stage.classList.add('speaking');(action?primary:close).focus({preventScroll:true});}};
   root.onkeydown=e=>{if(e.key==='Escape'){e.stopPropagation();api.close();}};return api;
 }
 
