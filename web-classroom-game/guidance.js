@@ -5,7 +5,7 @@ import {cases,toolLit} from './core.js';
 export function guideFor(s,scene,ready=false){
   const c=s.current;
   const guide=(step,title,detail,target=null,action=null)=>({step,title,detail,target,action});
-  if(s.completed){if(scene==='fair')return guide(4,'三件作品都亮了，找羽老师交流','羽老师会和你比较三次实验，并呈现检测记录和提交的报告。','mentor');if(scene==='workshop')return guide(4,'回游园会参加亮灯展示','从工坊左侧门出去，和同学们一起欣赏作品。','door');return guide(4,'离开工作台，参加亮灯展示','三份记录已经保存，回游园会找羽老师。',null,'leave');}
+  if(s.completed){if(scene==='fair')return guide(4,'四件作品都亮了，找羽老师交流','羽老师会和你比较四次实验，并呈现检测记录和提交的报告。','mentor');if(scene==='workshop')return guide(4,'回游园会参加亮灯展示','从工坊左侧门出去，和同学们一起欣赏作品。','door');return guide(4,'离开工作台，参加亮灯展示','四份记录已经保存，回游园会找羽老师。',null,'leave');}
   if(!s.accepted||!s.carrying){
     const q=questOwners[s.index];
     if(scene==='workshop')return guide(0,'回游园会找'+q.name,q.place+'的'+q.name+'有一件作品需要你调查。','door');

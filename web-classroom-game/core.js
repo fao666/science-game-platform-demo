@@ -1,5 +1,5 @@
 export const names={contact:'灯泡与灯座接触',lamp:'小灯泡',wire:'整根导线',switch:'开关',battery:'电池'};
-export const cases=[{title:'寻宝灯塔',fault:'contact',story:'灯塔昨天还能亮，今天合上开关却不亮了。请把模型带回科学工坊查一查。'},{title:'纸屋的小夜灯',fault:'lamp',story:'慢慢的纸屋小夜灯装好电池、合上开关仍然不亮。看起来相似的现象，不一定来自相同原因。'},{title:'星星舞台',fault:'battery',story:'团团的星星舞台不亮了，可能是灯泡、导线、连接、开关或电池出了问题。观察布局，自由选择检查方法，用证据帮助判断。'}];
+export const cases=[{title:'寻宝灯塔',fault:'contact',story:'灯塔昨天还能亮，今天合上开关却不亮了。请把模型带回科学工坊查一查。'},{title:'纸屋的小夜灯',fault:'lamp',story:'慢慢的纸屋小夜灯装好电池、合上开关仍然不亮。看起来相似的现象，不一定来自相同原因。'},{title:'星星舞台',fault:'battery',story:'团团的星星舞台不亮了，可能是灯泡、导线、连接、开关或电池出了问题。观察布局，自由选择检查方法，用证据帮助判断。'},{title:'摊位的欢迎灯',fault:'wire',story:'阿圆收齐同学的作品后，发现摊位的低压电池欢迎灯也不亮了。只有一处故障，请用自己的方法检查。'}];
 export function faultOf(c){return c.fault||['contact','lamp','wire'][c.index];}
 export function newCase(i){return {index:i,fault:cases[i].fault,fixed:[],power:true,closed:true,evidence:[],hypotheses:[],verified:false,report:null};}
 export function connected(edges,a,b){const seen=new Set([a]),queue=[a];for(const n of queue){for(const [x,y] of edges){const v=x===n?y:y===n?x:null;if(v!==null&&!seen.has(v)){seen.add(v);queue.push(v);}}}return seen.has(b);}
