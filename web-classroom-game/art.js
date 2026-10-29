@@ -77,3 +77,15 @@ export function drawLampBase(ctx,x,y,w,h){
   ctx.fillStyle='#b58129';ctx.beginPath();ctx.ellipse(cx,py-18,18,11,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#604e38';ctx.beginPath();ctx.ellipse(cx,py-18,12,7,0,0,Math.PI*2);ctx.fill();
   for(const px of [left,right]){ctx.fillStyle='#aa792e';ctx.fillRect(px-7,py-18,14,18);ctx.fillStyle='#f9dd92';ctx.beginPath();ctx.ellipse(px,py,10,8,0,0,Math.PI*2);ctx.fill();}ctx.restore();
 }
+
+// Complete holder remains fixed; only the removable bulb moves into the socket.
+export function drawSeatedLamp(ctx,x,y,w,h,lift=0,tilt=0){
+  const scale=w*.692/448,px=x+w*.154,py=y+h*.676,cx=px+(373-158)*scale,gy=py+(219-425)*scale;
+  drawLampBase(ctx,x,y,w,h);
+  // Threaded metal neck remains engaged with the socket even when partly unscrewed.
+  ctx.save();ctx.fillStyle='#b4a17c';ctx.fillRect(cx-8,gy-lift+24,16,Math.max(0,py-13-(gy-lift+24)));ctx.strokeStyle='#716550';ctx.lineWidth=1.5;for(let yy=gy-lift+26;yy<py-13;yy+=4){ctx.beginPath();ctx.moveTo(cx-8,yy+2);ctx.lineTo(cx+8,yy);ctx.stroke();}ctx.restore();
+  ctx.save();ctx.translate(cx,gy-lift);ctx.rotate(tilt);drawLooseBulb(ctx,0,0,scale/.2564);ctx.restore();
+  // Front half of the socket hides the cap as it enters; no cut-out of the atlas.
+  const socketY=py-18;ctx.save();ctx.fillStyle='#edc139';ctx.fillRect(cx-18,socketY+6,36,22);
+  ctx.beginPath();ctx.ellipse(cx,socketY,18,11,0,0,Math.PI);ctx.closePath();ctx.fill();ctx.strokeStyle='#bb8a25';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(cx,socketY,18,11,0,0,Math.PI);ctx.stroke();ctx.restore();
+}
