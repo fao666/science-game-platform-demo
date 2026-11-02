@@ -18,7 +18,8 @@ export const readings = {
  '交流':'jiāo liú','目标':'mù biāo','说明':'shuō míng','失败':'shī bài','保留':'bǎo liú',
  '检查':'jiǎn chá','调整':'tiáo zhěng','有效':'yǒu xiào','金属':'jīn shǔ','器材':'qì cái',
  '课堂':'kè táng','模型':'mó xíng','验证':'yàn zhèng','轮':'lún','明显':'míng xiǎn',
- '碰':'pèng','猜':'cāi','练':'liàn','测':'cè','选':'xuǎn','类':'lèi'
+ '碰':'pèng','猜':'cāi','练':'liàn','测':'cè','选':'xuǎn','类':'lèi',
+ '词语':'cí yǔ','其他':'qí tā','填':'tián','跳过':'tiào guò','确定':'què dìng'
 };
 export function installPinyin(root=document.body){
  const words=Object.keys(readings).sort((a,b)=>b.length-a.length);
