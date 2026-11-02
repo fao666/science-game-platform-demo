@@ -6,21 +6,21 @@ const icon=m=>spriteIndex[m.id]===undefined?m.symbol:`<span class="prop" style="
 const propImage=new Image();propImage.src='../assets/magnet/props.png';propImage.onload=()=>{if(state.tab==='transport')draw()};
 function checkedHistory(){const raw=localStorage.getItem(HIST);const value=raw?JSON.parse(raw):[];if(!Array.isArray(value))throw Error('历史格式错误');return value}
 const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch{return d}};
-const coreMaterials=['clip','wood','copper'];
+const coreMaterials=materials.map(m=>m.id);
 let state=read(KEY,null)||fresh(),selected='clip',hint=0,practice=false,prediction=null,drag=false;
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));return true}catch{$('#status').textContent='保存失败，请先导出记录后再退出。';return false}}
 function event(type,data={}){state.events.push({type,time:new Date().toISOString(),...data});save()}
 function say(text){$('#status').textContent=text}
 function modal(html,noPinyin=false){$('#dialogContent').toggleAttribute('data-no-pinyin',noPinyin);$('#dialogContent').innerHTML=html;$('#dialog').showModal()}
-$('#closeDialog').onclick=()=>$('#dialog').close();
+$('#closeDialog').onclick=()=>{$('#dialog').close();$('#closeDialog').textContent='回到实验';($('#bench')||$('#station')).scrollIntoView({behavior:'smooth',block:'start'});};
 function board(){ $('#observations').innerHTML=[...state.tests.map(t=>`<div class="observation">${escape(t.name)}：原来猜${t.prediction?'能':'不能'}吸引 → 实测${t.result?'被吸引':'没有被吸引'}</div>`),...state.moves.map(t=>`<div class="observation">小车第${t.round+1}轮 · ${escape(t.name)} · ${escape(t.board)}${Math.abs(t.to-t.from)>5?(t.to>t.from?'，小车向右移动':'，小车向左移动'):'，小车没有明显移动'}</div>`)].reverse().join('')||'<p class="muted">还没有测试。先选一件物品，再猜一猜。</p>';;updateProgress(); }
 
 function tested(id){return state.tests.some(t=>t.id===id)}
 function updateProgress(){
  const count=coreMaterials.filter(tested).length, routes=state.delivered.filter(Boolean).length;
- $('#missionProgress').innerHTML=`<strong>今天只做这3步</strong><span class="${count===3?'complete':''}">${count===3?'✓':'①'} 查材料 ${count}/3</span><span class="${routes===2?'complete':''}">${routes===2?'✓':'②'} 送小车 ${routes}/2</span><span class="${state.done?'complete':''}">${state.done?'✓':'③'} 和老师说发现</span><small>多余材料和隔板实验是选做。先做一小步，不用一次做完。</small>`;
- const next=state.done?'本轮已完成！可以回看记录，或自由试试选做实验。':state.tab==='materials'?(count<3?(tested(selected)?`这件已调查。可以在下面分一分类，再选下一件。已查${count}/3件。`:`现在先查：${materials.find(m=>m.id===selected).name}。先猜，再按“试一试”。已查${count}/3件。`):'3件都查过了！可以去小车台，也可以再试一次。'):state.tab==='transport'?`这是第${state.round+1}条路线。${state.delivered[state.round]?'已经送达，按下面的绿色按钮继续。':'先选装载材料，再移动磁铁。目标是黄色展台。'}`:'看看上方哪一步还没完成；完成后，向老师说一说你的发现。';
+ $('#missionProgress').innerHTML=`<strong>今天只做这3步</strong><span class="${count===coreMaterials.length?'complete':''}">${count===coreMaterials.length?'✓':'①'} 查材料 ${count}/${coreMaterials.length}</span><span class="${routes===2?'complete':''}">${routes===2?'✓':'②'} 送小车 ${routes}/2</span><span class="${state.done?'complete':''}">${state.done?'✓':'③'} 和老师说发现</span><small>8件材料一件一件查。每次只看眼前这一件，查过的会帮你记住。</small>`;
+ const next=state.done?'本轮已完成！可以回看记录，或自由试试选做实验。':state.tab==='materials'?(count<coreMaterials.length?(tested(selected)?`这件已调查。可以在下面分一分类，再选下一件。已查${count}/${coreMaterials.length}件。`:`现在先查：${materials.find(m=>m.id===selected).name}。先猜，再按“试一试”。已查${count}/${coreMaterials.length}件。`):'8件都查过了！可以去小车台，也可以再试一次。'):state.tab==='transport'?`这是第${state.round+1}条路线。${state.delivered[state.round]?'已经送达，按下面的绿色按钮继续。':'先选装载材料，再移动磁铁。目标是黄色展台。'}`:'看看上方哪一步还没完成；完成后，向老师说一说你的发现。';
  $('#nextAction').textContent=next;
  document.querySelectorAll('[data-material]').forEach(b=>{const id=b.dataset.material,done=tested(id);b.classList.toggle('investigated',done);b.querySelector('.check-status').textContent=done?'✓ 已调查 · 可再试':'○ 还没调查';b.setAttribute('aria-label',materials.find(m=>m.id===id).name+(done?'，已调查，可以再试':'，还没调查'));});
 }
@@ -31,7 +31,7 @@ function render(){
 }
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{recordMove();state.tab=b.dataset.tab;render()});
 function renderMaterials(){
- $('#station').innerHTML=`<h2>第1步 · 先查3件材料</h2><div class="actions"><button id="practice">先练一练</button><button id="direct">直接调查</button></div><div id="practiceText"></div><p class="task-note">先调查下面3件物品就好。猜错没关系，测过会出现“✓ 已调查”。</p><div id="bench" class="bench"></div><h3>换一件继续查</h3><div class="materials core-materials">${coreMaterials.map(id=>materialCard(materials.find(m=>m.id===id))).join('')}</div><details class="extra-materials"><summary>还有5件材料，想多试再打开（选做）</summary><div class="materials">${materials.filter(m=>!coreMaterials.includes(m.id)).map(materialCard).join('')}</div></details><div class="actions"><button class="primary" id="toTransport">查好了，去送小车 →</button></div>`;
+ $('#station').innerHTML=`<h2>第1步 · 一件一件查材料</h2><div class="actions"><button id="practice">先练一练</button><button id="direct">直接调查</button></div><div id="practiceText"></div><p class="task-note">现在只查眼前这一件。测过后按“下一件”，不用一次记住8件。</p><div id="bench" class="bench"></div><details class="material-overview"><summary>全部8件的调查进度 · 点开查看或换一件</summary><div class="materials">${materials.map(materialCard).join('')}</div></details><div class="actions"><button class="primary" id="toTransport">查好了，去送小车 →</button></div>`;
  document.querySelectorAll('[data-material]').forEach(b=>b.onclick=()=>{selected=b.dataset.material;prediction=null;renderBench();updateProgress();document.querySelectorAll('[data-material]').forEach(x=>x.classList.toggle('active',x===b))});
  $('#practice').onclick=()=>{practice=true;$('#practiceText').innerHTML='<div class="practice">① 选一件物品。② 按“我猜能/不能”。③ 点“磁铁靠近”，观察结果。猜错可以改想法，不扣分。现在由你来试。</div>';event('practice')};
  $('#direct').onclick=()=>{$('#practiceText').innerHTML='';practice=false};
@@ -42,11 +42,12 @@ function renderBench(){
  $('#bench').innerHTML=`<h3>${m.name}</h3><div><span id="magnetIcon" class="symbol"><span class="prop" style="background-position:0% 0%"></span></span><span id="objectIcon" class="symbol">${icon(m)}</span></div><p class="current-step">${prediction===null?'现在先选：我猜能，还是不能？':'已选好猜想。下一步：按绿色按钮试一试。'}</p><div class="actions"><button id="yes" class="${prediction===true?'active':''}">我猜能吸引</button><button id="no" class="${prediction===false?'active':''}">我猜不能吸引</button></div><button id="test" class="primary" ${prediction===null?'disabled':''}>让磁铁靠近，试一试</button><p id="result" class="result">结果还没有出现，先留下你的猜想。</p>`;
  $('#yes').onclick=()=>{prediction=true;renderBench()};$('#no').onclick=()=>{prediction=false;renderBench()};
  $('#test').onclick=()=>{state.tests.push({id:m.id,name:m.name,prediction,result:m.attracts,time:new Date().toISOString()});event('material-test',{material:m.id,prediction,result:m.attracts});$('#result').textContent=m.attracts?'✓ 调查过了：物品被吸引了。可以在下面分一分类，再选下一件。':'✓ 调查过了：物品没有被吸引。可以在下面分一分类，再选下一件。';$('#objectIcon').animate([{transform:'translateX(0)'},{transform:`translateX(${m.attracts?-42:0}px)`}],{duration:600,fill:'forwards'});board();showClassification(m);};
+ if(tested(m.id)){const last=state.tests.filter(t=>t.id===m.id).at(-1);$('#result').textContent='✓ 这件已经调查过了：上次'+(last.result?'被吸引了。':'没有被吸引。')+'可以再测，也可以选下一件。';showClassification(m);}
 }
 function showClassification(m){
  $('#classification')?.remove();const box=document.createElement('div');box.id='classification';
  box.innerHTML='<p>再想一想：根据刚才的现象，分到哪一类？</p><div class="actions"><button data-group="yes">能被吸引</button><button data-group="no">不能被吸引</button></div><p id="groupFeedback"></p><button id="nextMaterial" class="primary">选下一件 →</button>';
- $('#bench').append(box);$('#nextMaterial').onclick=()=>{const next=coreMaterials.find(id=>!tested(id));if(next){selected=next;prediction=null;render();$('#station').scrollIntoView({behavior:'smooth',block:'start'});}else{state.tab='transport';render();$('#station').scrollIntoView({behavior:'smooth',block:'start'});}};box.querySelectorAll('[data-group]').forEach(b=>b.onclick=()=>{const group=b.dataset.group==='yes';state.groups??={};state.groups[m.id]=group;event('classify',{material:m.id,group});updateProgress();$('#groupFeedback').textContent=group===m.attracts?'✓ 已分类。按“选下一件”继续，也可以重新测试。':'这和观察板里刚才的现象不同。可以保留这个想法，再测试一次或重新归类。';});
+ $('#bench').append(box);const nextId=coreMaterials.find(id=>!tested(id));$('#nextMaterial').textContent=nextId?'下一件：'+materials.find(m=>m.id===nextId).name+' →':'8件都查过了，去送小车 →';$('#nextMaterial').onclick=()=>{const next=coreMaterials.find(id=>!tested(id));if(next){selected=next;prediction=null;render();($('#bench')||$('#station')).scrollIntoView({behavior:'smooth',block:'start'});}else{state.tab='transport';render();($('#bench')||$('#station')).scrollIntoView({behavior:'smooth',block:'start'});}};box.querySelectorAll('[data-group]').forEach(b=>b.onclick=()=>{const group=b.dataset.group==='yes';state.groups??={};state.groups[m.id]=group;event('classify',{material:m.id,group});updateProgress();$('#groupFeedback').textContent=group===m.attracts?'✓ 已分类。按“选下一件”继续，也可以重新测试。':'这和观察板里刚才的现象不同。可以保留这个想法，再测试一次或重新归类。';});
 }
 let moveStart=null, lastCart=0;
 function renderTransport(){
@@ -71,13 +72,14 @@ setInterval(()=>{if(state.tab!=='transport')return;const before=state.cart;state
 function renderReflect(){
  $('#station').innerHTML=`<h2>把发现带回课堂</h2><p>你完成了${new Set(state.tests.map(x=>x.id)).size}种材料测试，送达了${state.delivered.filter(Boolean).length}条路线。车动了是结果，为什么动需要你用证据说明。</p><p class="practice">可以说：我原来猜____，测试后看到____。我给小车装了____，把磁铁____，小车____。</p><label for="reflection">我的解释（也可以先和老师口头交流）</label><textarea id="reflection" placeholder="我先猜……后来我看到……"></textarea><div class="actions"><button id="backMaterial">返回补测</button><button id="finish" class="primary">完成调查并保存</button></div><p id="finishMessage"></p>`;
  $('#reflection').value=state.reflection;$('#reflection').oninput=e=>{state.reflection=e.target.value;save()};$('#backMaterial').onclick=()=>{state.tab='materials';render()};
- $('#finish').onclick=()=>{if(!coreMaterials.every(tested)||!state.delivered.every(Boolean)){say('看看上面的进度：查完3件材料、送达2条路线，就可以完成。可以随时返回继续。');return}state.done=true;event('complete');updateProgress();try{localStorage.setItem(HIST,JSON.stringify(archive(checkedHistory(),state)));save();$('#finishMessage').innerHTML='<h3>科学展准备好了！</h3><p>你的观察已经保存。和老师、同学分享一次改变想法的经历吧。</p>'}catch{state.done=false;say('归档失败，本轮保留。请导出后再试。')}};
+ $('#finish').onclick=()=>{if(!coreMaterials.every(tested)||!state.delivered.every(Boolean)){say('看看上面的进度：查完8件材料、送达2条路线，就可以完成。可以随时返回继续。');return}state.done=true;event('complete');updateProgress();try{localStorage.setItem(HIST,JSON.stringify(archive(checkedHistory(),state)));save();$('#finishMessage').innerHTML='<h3>科学展准备好了！</h3><p>你的观察已经保存。和老师、同学分享一次改变想法的经历吧。</p>'}catch{state.done=false;say('归档失败，本轮保留。请导出后再试。')}};
 }
 $('#help').onclick=()=>{const hints=state.tab==='materials'?['选一件物品，先留下猜想，再让磁铁靠近。','比较两件外观相似、材料不同的物品，结果相同吗？','观察板里哪一次结果和猜想不一样？可以再试一次。']:['目标是把小车送到黄色区域。先看看装载槽和磁铁的位置。','一次只改变材料或磁铁位置，比较小车是否移动。','可以回材料站找一条真实测试记录，再决定装什么。'];$('#hint').textContent=hints[Math.min(hint++,hints.length-1)];event('help',{tab:state.tab,level:hint})};
 $('#teacher').onclick=()=>modal('<h2>40分钟综合探究课</h2><p>教师演示机＋学生一人一机。建议先在演示机介绍操作，再让学生独立预测、测试和修正。</p><ol><li>0—5分钟：情境与预测；演示操作，不演示答案。</li><li>5—13分钟：真实磁铁与材料实验，对照网页调查站。</li><li>13—23分钟：个人完成调查与第一条运输路线。</li><li>23—31分钟：变化路线与修改，薄纸板隔物实验可选。</li><li>31—37分钟：暂停全班游戏，讨论两种不同的试验路径。</li><li>37—40分钟：出口说明、导出个人记录。</li></ol><p>追问：你改了什么？看到了什么？还需要比较什么？</p><p>预计时长需试教。此版本为各设备本地记录，不含实时班级监控。实物实验使用适龄磁铁，不使用强力磁铁。</p>',true);
 $('#history').onclick=()=>{const records=read(HIST,[]);modal(`<h2>已完成的调查</h2>${records.map((s,i)=>`<h3>第${i+1}轮</h3><p>${s.tests.length}次材料测试 · ${s.moves.length}次运输观察</p><p>${escape(s.reflection||'解释留待课堂交流')}</p>`).join('')||'<p>完成调查后会自动保存到这里。</p>'}`)};
 $('#export').onclick=()=>{recordMove();const blob=new Blob([JSON.stringify({game:'磁力运输队',current:state,history:read(HIST,[])},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='磁力运输队观察记录.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $('#restart').onclick=()=>{if(state.done){try{localStorage.setItem(HIST,JSON.stringify(archive(checkedHistory(),state)))}catch{say('归档失败，请先导出记录。本轮仍保留。');return}}moveStart=null;state=fresh();prediction=null;render();say('新一轮调查已开始，已完成的历史仍保留。')};
-render();if(!state.events.length)modal('<h2>我们先查一件物品</h2><p>今天只做3步：查3件材料、送2次小车、说说发现。</p><p>先看铁回形针，猜一猜它能不能被磁铁吸引，再按绿色按钮试一试。</p><p>猜错没关系。其他材料是选做，进度会帮你记住，不用急。</p>');
+render();if(!state.events.length)modal('<h2>我们先查一件物品</h2><p>今天有3步：查8件材料、送2次小车、说说发现。</p><p>先看铁回形针，猜一猜它能不能被磁铁吸引，再按绿色按钮试一试。</p><p>猜错没关系。材料会一件一件出现，进度会帮你记住，不用急。</p>');
 
+if(!state.events.length)$('#closeDialog').textContent='开始查第一件';
 installPinyin();
