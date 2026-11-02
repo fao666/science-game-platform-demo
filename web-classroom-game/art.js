@@ -10,11 +10,11 @@ export function drawCraft(ctx,index,x,y,w,h){
   ctx.drawImage(crafts,index*cell,0,cell,crafts.naturalHeight,x,y,w,h);
 }
 export function drawPart(ctx,kind,x,y,w,h){
-  if(kind==='battery'||kind==='emptyBattery'){
+  if(kind==='battery'||kind==='emptyBattery'||kind==='newBattery'){
     if(!holders.complete||!holders.naturalWidth)return;
-    const center=kind==='battery'?617:1157,scale=h/790;
+    const center=kind==='emptyBattery'?1157:617,scale=h/790;
     ctx.save();ctx.translate(x+w/2,y);ctx.scale(scale,scale);
-    ctx.drawImage(holders,center-125,0,250,887,-125,-44,250,887);ctx.restore();return;
+    ctx.drawImage(holders,center-125,0,250,887,-125,-44,250,887);ctx.restore();if(kind==='newBattery')drawFreshCell(ctx,x+w/2-h*.065,y+h*.19,h*.13,h*.68);return;
   }
   if(kind==='wire'){
     if(leads.complete&&leads.naturalWidth)ctx.drawImage(leads,0,0,leads.naturalWidth,leads.naturalHeight/2,x,y,w,h);
@@ -88,4 +88,12 @@ export function drawSeatedLamp(ctx,x,y,w,h,lift=0,tilt=0){
   // Front half of the socket hides the cap as it enters; no cut-out of the atlas.
   const socketY=py-18;ctx.save();ctx.fillStyle='#edc139';ctx.fillRect(cx-18,socketY+6,36,22);
   ctx.beginPath();ctx.ellipse(cx,socketY,18,11,0,0,Math.PI);ctx.closePath();ctx.fill();ctx.strokeStyle='#bb8a25';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(cx,socketY,18,11,0,0,Math.PI);ctx.stroke();ctx.restore();
+}
+
+// Alternate wrapper identifies a replaced cell, never a hidden fault in an original cell.
+export function drawFreshCell(ctx,x,y,w,h){
+  ctx.save();const g=ctx.createLinearGradient(x,y,x+w,y);g.addColorStop(0,'#075985');g.addColorStop(.45,'#22d3ee');g.addColorStop(1,'#087e9a');ctx.fillStyle=g;ctx.beginPath();ctx.roundRect(x,y,w,h,Math.min(w*.2,5));ctx.fill();
+  ctx.fillStyle='#dfab71';ctx.fillRect(x,y,w,h*.15);ctx.fillStyle='#ece8dc';ctx.fillRect(x+w*.25,y-h*.025,w*.5,h*.025);ctx.fillRect(x+w*.12,y+h,w*.76,h*.025);
+  ctx.save();ctx.beginPath();ctx.rect(x,y+h*.16,w,h*.82);ctx.clip();ctx.strokeStyle='#bdf8ff';ctx.lineWidth=Math.max(1,w*.09);for(let yy=y+h*.2;yy<y+h;yy+=h*.15){ctx.beginPath();ctx.moveTo(x,yy+w*.4);ctx.lineTo(x+w,yy);ctx.stroke();}ctx.restore();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(x+w*.08,y+h*.4,w*.84,h*.24,3);ctx.fill();ctx.fillStyle='#075985';ctx.font='bold '+Math.max(8,w*.62)+'px sans-serif';ctx.textAlign='center';ctx.fillText('新',x+w*.5,y+h*.57);ctx.restore();
 }
