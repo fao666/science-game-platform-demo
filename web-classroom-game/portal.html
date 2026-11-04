@@ -416,14 +416,19 @@
     document.querySelector('#activityNav').addEventListener('click', () => showToast('活动中心将在后续版本开放'));
     document.querySelector('[data-scroll="courses"]').addEventListener('click', () => document.querySelector('#courses').scrollIntoView({ behavior: 'smooth' }));
 
-    document.querySelectorAll('.grade-tab').forEach(tab => tab.addEventListener('click', () => {
-      document.querySelectorAll('.grade-tab').forEach(item => item.classList.remove('active'));
-      tab.classList.add('active');
-      const grade = tab.dataset.grade;
-      document.querySelector('#gradeDescription').textContent = grade === '四' ? '四年级正在进行电路主题科学任务' : grade + '年级游戏正在建设中';
-      document.querySelector('#gameGrid').style.opacity = grade === '四' ? '1' : '.42';
-      showToast(grade === '四' ? '已显示四年级游戏' : grade + '年级内容正在建设中');
-    }));
+    const fourthGradeCards = document.querySelector('#gameGrid').innerHTML;
+    const magnetPath = location.pathname.includes('/classroom/') || location.pathname.endsWith('/portal.html') ? './magnet/index.html' : './classroom/magnet/index.html';
+    function showGrade(grade) {
+      document.querySelectorAll('.grade-tab').forEach(item => item.classList.toggle('active', item.dataset.grade === grade));
+      const grid = document.querySelector('#gameGrid');
+      grid.style.opacity = '1';
+      if (grade === '四') { grid.innerHTML = fourthGradeCards; grid.querySelector('#previewBtn').onclick = () => location.href = location.pathname.endsWith('/portal.html') ? './index.html' : './classroom/index.html'; }
+      else if (grade === '二') grid.innerHTML = `<article class="unit-card"><div class="unit-cover" style="background:linear-gradient(120deg,#146b73,#72bca1)"><div><div class="unit-term">二年级下册 · 第二单元</div><strong>玩磁铁</strong></div><span class="unit-icon">🧲</span></div><div class="unit-body"><h3>磁力运输队</h3><p>先猜测和测试材料，再让模型小车不接触也能运动。综合探究课含入门练习、观察板与课堂回顾。</p><div class="unit-action"><span class="unit-status ready">40分钟课堂辅助 · 试玩版</span><a class="outline-btn" href="${magnetPath}">开始任务</a></div></div></article>`;
+      else grid.innerHTML = `<article class="coming-card"><h3>${grade}年级课程</h3><p>游戏正在建设中，请选择二年级或四年级体验。</p></article>`;
+      document.querySelector('#gradeDescription').textContent = grade === '二' ? '二年级 · 玩磁铁综合探究' : grade === '四' ? '四年级正在进行电路主题科学任务' : grade + '年级游戏正在建设中';
+    }
+    document.querySelectorAll('.grade-tab').forEach(tab => tab.onclick = () => showGrade(tab.dataset.grade));
+    if (new URLSearchParams(location.search).get('grade')) showGrade(new URLSearchParams(location.search).get('grade'));
     document.querySelectorAll('[data-grade-jump]').forEach(btn => btn.addEventListener('click', () => {
       document.querySelector(`.grade-tab[data-grade="${btn.dataset.gradeJump}"]`).click();
       document.querySelector('#courses').scrollIntoView({ behavior: 'smooth' });

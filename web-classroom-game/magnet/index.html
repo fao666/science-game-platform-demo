@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>磁力运输队 · 科学能量站</title><link rel="stylesheet" href="style.css"></head>
+<body><header><a href="../portal.html?grade=二">← 二年级课程</a><strong>🧲 磁力运输队</strong><button id="teacher">教师课堂安排</button><button id="history">历史记录</button><button id="export">导出记录</button><button id="restart">重新开始</button></header>
+<main><section class="intro"><div><p class="eyebrow">二年级 · 玩磁铁 · 综合探究</p><h1>让科学展的小车动起来</h1><p>先调查材料，再让小车不用手碰也能到达展台。试错、回头补测，都可以。</p></div><div class="steps"><span>① 调查材料</span><span>② 运输实验</span><span>③ 解释发现</span></div></section>
+<nav aria-label="实验站"><button data-tab="materials">① 材料调查站</button><button data-tab="transport">② 小车运输台</button><button data-tab="reflect">③ 我的发现</button></nav>
+<section id="missionProgress" class="mission-progress" aria-label="任务进度"></section>
+<div class="layout"><section id="station" class="panel"></section><aside class="panel"><h2>现在做什么</h2><p id="nextAction" role="status"></p><details id="observationDetails"><summary>查看我的观察板</summary><p class="muted">测过的结果会保存在这里，随时可以回来对照。</p><div id="observations"></div></details><button id="help">我卡住了</button><div id="hint" role="status"></div></aside></div>
+<p id="status" role="status" aria-live="polite"></p><footer>课堂模型 · 磁铁吸引铁等材料；不是所有金属都能被吸引。真实器材表现请和老师一起验证。</footer></main>
+<dialog id="dialog"><div id="dialogContent"></div><button id="closeDialog">回到实验</button></dialog><script type="module" src="main.js"></script></body></html>
