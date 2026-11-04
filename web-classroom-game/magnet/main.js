@@ -96,7 +96,7 @@ function draw(){
  }
  g.font='22px sans-serif';g.fillStyle='#203b50';g.fillText(materials.find(m=>m.id===state.load).symbol,x-10,240);
  g.font='15px sans-serif';g.fillText('装载物',Math.max(10,Math.min(740,x-24)),311);
- g.font='16px sans-serif';g.fillText('侧面看：上方移动磁铁，下方是小车',250,22);
+
  g.fillStyle='#49606c';g.font='15px sans-serif';g.fillText(thick?'厚垫板增加间距，不表示挡住磁力。':paper?'隔板固定不动，磁铁和小车不接触。':'没有隔板，磁铁和小车不接触。',245,346);
 }
 
