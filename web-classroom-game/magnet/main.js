@@ -73,7 +73,7 @@ function draw(){
  const c=$('#track');if(!c)return;
  const thick=state.board==='thick',paper=state.board==='paper',hasBoard=thick||paper;
  const guide=$('#barrierGuide'), guideText=paper?'隔着薄纸板试一试：移动上方磁铁，观察下方小车。':thick?'换成厚垫板：磁铁被抬高了。移动磁铁，比较小车的变化。':'先不加隔板：移动磁铁，观察小车；再选薄纸板来比较。';
- if(guide.textContent!==guideText)guide.textContent=guideText;
+ if(guide.dataset.board!==state.board){guide.dataset.board=state.board;guide.textContent=guideText;}
  const g=c.getContext('2d');g.clearRect(0,0,800,360);
  g.fillStyle='#f3e7d1';g.fillRect(0,285,800,75);g.fillStyle='#d9ad5c';g.fillRect(25,290,750,7);
  const goal=state.round?55:650;g.fillStyle='#f8d96d';g.fillRect(goal,215,95,85);g.fillStyle='#665322';g.font='bold 19px sans-serif';g.fillText('展台',goal+25,325);g.font='15px sans-serif';g.fillText('zhǎn tái',goal+20,346);
