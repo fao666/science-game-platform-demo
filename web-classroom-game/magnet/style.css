@@ -14,3 +14,7 @@ rt{font-size:max(12px,.78em);line-height:1.2;color:#315a69}ruby{padding-inline:.
 #bench{scroll-margin-top:180px}@media(max-width:900px){#bench{scroll-margin-top:12px}}
 
 #reflectionEditor{padding:18px;border:2px solid #cee3dc;border-radius:16px;background:#f5faf7}.word-choices{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}.word-choices button{min-width:130px}.reflection-count{color:#17616a;font-weight:bold}.reflection-preview{white-space:pre-line;background:#fff8e5;padding:18px;border-radius:12px;line-height:3!important}#customWordArea{margin-top:14px}#customWordArea label{display:block;line-height:2.5}#customWord{font:inherit;width:100%;padding:14px;border:1px solid #a6bfc2;border-radius:10px;min-height:48px}#reflectionQuestion{font-size:22px}#reflectionNotice{color:#17616a}
+
+.experiment-guide{margin-top:16px;padding:14px 18px;background:#fff2bd;border:2px solid #d6a332;border-radius:14px;font-size:19px;font-weight:bold;line-height:2.6;color:#624418}#track{margin-top:8px} @media(max-width:520px){.experiment-guide{font-size:17px;padding:10px}}
+
+.transport-mode .mission-progress{position:static}.experiment-guide{scroll-margin-top:16px}

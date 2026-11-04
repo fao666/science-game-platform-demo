@@ -27,6 +27,7 @@ function updateProgress(){
 }
 function materialCard(m){return `<button class="material ${m.id===selected?'active':''}" data-material="${m.id}"><span class="symbol">${icon(m)}</span><strong>${m.name}</strong><span class="check-status">○ 还没调查</span></button>`}
 function render(){
+ document.body.classList.toggle('transport-mode',state.tab==='transport');
  hint=0;$('#hint').textContent=''; document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===state.tab));
  if(state.tab==='materials')renderMaterials();else if(state.tab==='transport')renderTransport();else renderReflect();board();save();
 }
@@ -53,7 +54,7 @@ function showClassification(m){
 let moveStart=null, lastCart=0;
 function renderTransport(){
  const r=state.round;
- $('#station').innerHTML=`<h2>${r?'换个展台，再试一次':'让小车到达黄色展台'}</h2><p>小车的装载槽放什么？把磁铁放在哪里？你可以返回材料站补做调查。</p><div class="controls"><label>装载材料 <select id="load">${materials.map(m=>`<option value="${m.id}" ${state.load===m.id?'selected':''}>${m.name}（${(readings[m.name]||'').replaceAll(' ',' ')}）</option>`).join('')}</select></label><label>隔物实验 <select id="barrier"><option value="none">不加隔板（gé bǎn）</option><option value="paper">薄纸板（báo zhǐ bǎn）</option><option value="thick">厚垫板（hòu diàn bǎn）</option></select></label></div><canvas id="track" width="800" height="290" tabindex="0" aria-label="运输实验台，拖动磁铁或使用下方左右按钮和位置滑块"></canvas><p class="muted">拖动红蓝磁铁，或用下方滑块/左右按钮。磁铁与小车留有间隙。方向键也能移动磁铁。</p><label>磁铁位置 <input id="position" class="range" type="range" min="35" max="770" value="${state.magnet}" aria-label="磁铁位置"></label><div class="actions"><button id="left">← 磁铁向左</button><button id="right">磁铁向右 →</button><button id="resetCart">小车回起点</button><button id="nextRound" class="primary">${r?'去整理发现':'试试另一条运输路线'}</button></div><p class="result" id="transportResult">${state.delivered[r]?'已送达！可以继续测试不同材料。':'把小车送到黄色区域。若没有移动，比较材料和磁铁位置。'}</p><p class="muted">试着加上薄纸板，看看小车还动不动。厚垫板让磁铁离小车更远；这不表示它挡住了磁力。请和老师用真的磁铁试一试。</p>`;
+ $('#station').innerHTML=`<h2>${r?'换个展台，再试一次':'让小车到达黄色展台'}</h2><p>小车的装载槽放什么？把磁铁放在哪里？你可以返回材料站补做调查。</p><div class="controls"><label>装载材料 <select id="load">${materials.map(m=>`<option value="${m.id}" ${state.load===m.id?'selected':''}>${m.name}（${(readings[m.name]||'').replaceAll(' ',' ')}）</option>`).join('')}</select></label><label>隔物实验 <select id="barrier"><option value="none">不加隔板（gé bǎn）</option><option value="paper">薄纸板（báo zhǐ bǎn）</option><option value="thick">厚垫板（hòu diàn bǎn）</option></select></label></div><div class="experiment-guide" id="barrierGuide" role="status" aria-live="polite"></div><canvas id="track" width="800" height="360" tabindex="0" aria-label="运输实验台，拖动磁铁或使用下方左右按钮和位置滑块"></canvas><p class="muted">拖动红蓝磁铁，或用下方滑块/左右按钮。磁铁与小车留有间隙。方向键也能移动磁铁。</p><label>磁铁位置 <input id="position" class="range" type="range" min="35" max="770" value="${state.magnet}" aria-label="磁铁位置"></label><div class="actions"><button id="left">← 磁铁向左</button><button id="right">磁铁向右 →</button><button id="resetCart">小车回起点</button><button id="nextRound" class="primary">${r?'去整理发现':'试试另一条运输路线'}</button></div><p class="result" id="transportResult">${state.delivered[r]?'已送达！可以继续测试不同材料。':'把小车送到黄色区域。若没有移动，比较材料和磁铁位置。'}</p>`;
  $('#barrier').value=state.board;
  $('#load').onchange=e=>{recordMove();state.load=e.target.value;event('load',{load:state.load});draw()};
  $('#barrier').onchange=e=>{recordMove();state.board=e.target.value;event('barrier',{board:state.board});draw()};
@@ -68,7 +69,37 @@ function renderTransport(){
 }
 function beginMove(){if(moveStart===null)moveStart=state.cart}
 function recordMove(){if(moveStart===null)return;state.moves.push({round:state.round,from:moveStart,to:state.cart,name:materials.find(m=>m.id===state.load).name,board:{none:'无隔板',paper:'薄纸板',thick:'厚垫板'}[state.board],time:new Date().toISOString()});moveStart=null;save();board()}
-function draw(){const c=$('#track');if(!c)return;const g=c.getContext('2d');g.clearRect(0,0,800,290);g.fillStyle='#f3e7d1';g.fillRect(0,150,800,140);g.fillStyle='#d9ad5c';g.fillRect(25,200,750,7);g.fillStyle='#f8d96d';const goal=state.round?55:650;g.fillRect(goal,130,95,100);g.fillStyle='#665322';g.font='bold 20px sans-serif';g.fillText('展台',goal+25,120);g.font='16px sans-serif';g.fillText('zhǎn tái',goal+20,98);if(state.board!=='none'){g.fillStyle=state.board==='paper'?'#fffdf1':'#bac7b9';g.fillRect(20,235,760,state.board==='paper'?6:25)}const x=state.cart;if(!propImage.complete||!propImage.naturalWidth){g.fillStyle='#438ba0';g.fillRect(x-34,150,68,35);g.fillStyle='#203b50';for(const w of [-23,23]){g.beginPath();g.arc(x+w,191,12,0,Math.PI*2);g.fill()}g.font='24px sans-serif';g.fillText(materials.find(m=>m.id===state.load).symbol,x-12,150);}const mx=state.magnet;if(!propImage.complete||!propImage.naturalWidth){g.fillStyle='#ec6c60';g.fillRect(mx-24,65,24,45);g.fillStyle='#498cb5';g.fillRect(mx,65,24,45);}g.fillStyle='#203b50';g.font='16px sans-serif';g.fillText('磁铁',mx-16,52);g.font='16px sans-serif';g.fillText('cí tiě',mx-17,31);g.font='15px sans-serif';g.fillText('装载槽',x-22,225);g.font='15px sans-serif';g.fillText('zhuāng zài cáo',x-35,243);if(propImage.complete&&propImage.naturalWidth){const sw=propImage.naturalWidth/3,sh=propImage.naturalHeight/3;g.drawImage(propImage,2*sw,2*sh,sw,sh,x-48,125,96,80);g.font='22px sans-serif';g.fillText(materials.find(m=>m.id===state.load).symbol,x-10,147);g.drawImage(propImage,0,0,sw,sh,mx-33,62,66,55);}}
+function draw(){
+ const c=$('#track');if(!c)return;
+ const thick=state.board==='thick',paper=state.board==='paper',hasBoard=thick||paper;
+ const guide=$('#barrierGuide'), guideText=paper?'隔着薄纸板试一试：移动上方磁铁，观察下方小车。':thick?'换成厚垫板：磁铁被抬高了。移动磁铁，比较小车的变化。':'先不加隔板：移动磁铁，观察小车；再选薄纸板来比较。';
+ if(guide.textContent!==guideText)guide.textContent=guideText;
+ const g=c.getContext('2d');g.clearRect(0,0,800,360);
+ g.fillStyle='#f3e7d1';g.fillRect(0,285,800,75);g.fillStyle='#d9ad5c';g.fillRect(25,290,750,7);
+ const goal=state.round?55:650;g.fillStyle='#f8d96d';g.fillRect(goal,215,95,85);g.fillStyle='#665322';g.font='bold 19px sans-serif';g.fillText('展台',goal+25,325);g.font='15px sans-serif';g.fillText('zhǎn tái',goal+20,346);
+ // Side view: the continuous sheet sits BETWEEN the moving magnet and load.
+ const boardTop=thick?100:174,boardHeight=thick?94:10,magnetTop=thick?34:108;
+ if(hasBoard){
+  g.fillStyle=thick?'#bac7b9':'#fff4cc';g.fillRect(18,boardTop,764,boardHeight);g.strokeStyle=thick?'#647b68':'#b58a38';g.lineWidth=2;g.strokeRect(18,boardTop,764,boardHeight);
+  if(thick){g.strokeStyle='#8fa18d';for(let y=boardTop+12;y<boardTop+boardHeight;y+=14){g.beginPath();g.moveTo(20,y);g.lineTo(780,y);g.stroke()}}
+  g.fillStyle='#203b50';g.font='bold 18px sans-serif';g.fillText(thick?'厚垫板 · 把距离拉大':'薄纸板 · 隔在磁铁和物品之间',260,thick?148:205);
+ }
+ const x=state.cart,mx=state.magnet;
+ g.fillStyle='#203b50';g.font='16px sans-serif';g.fillText('磁铁',Math.max(10,Math.min(744,mx-16)),magnetTop-8);g.font='14px sans-serif';g.fillText('cí tiě',Math.max(10,Math.min(744,mx-17)),magnetTop-26);
+ if(propImage.complete&&propImage.naturalWidth){
+  const sw=propImage.naturalWidth/3,sh=propImage.naturalHeight/3;
+  g.drawImage(propImage,2*sw,2*sh,sw,sh,x-48,220,96,70);
+  g.drawImage(propImage,0,0,sw,sh,mx-33,magnetTop,66,55);
+ }else{
+  g.fillStyle='#438ba0';g.fillRect(x-34,245,68,30);g.fillStyle='#203b50';for(const w of [-23,23]){g.beginPath();g.arc(x+w,280,10,0,Math.PI*2);g.fill()}
+  g.fillStyle='#ec6c60';g.fillRect(mx-24,magnetTop,24,45);g.fillStyle='#498cb5';g.fillRect(mx,magnetTop,24,45);
+ }
+ g.font='22px sans-serif';g.fillStyle='#203b50';g.fillText(materials.find(m=>m.id===state.load).symbol,x-10,240);
+ g.font='15px sans-serif';g.fillText('装载物',Math.max(10,Math.min(740,x-24)),311);
+ g.font='16px sans-serif';g.fillText('侧面看：上方移动磁铁，下方是小车',250,22);
+ g.fillStyle='#49606c';g.font='15px sans-serif';g.fillText(thick?'厚垫板增加间距，不表示挡住磁力。':paper?'隔板固定不动，磁铁和小车不接触。':'没有隔板，磁铁和小车不接触。',245,346);
+}
+
 setInterval(()=>{if(state.tab!=='transport')return;const before=state.cart;state.cart=stepCart(state.cart,state.magnet,state.load,state.board);if(state.cart!==before){beginMove();draw();lastCart=Date.now();const arrived=state.round?state.cart<=145:state.cart>=650;if(arrived&&!state.delivered[state.round]){state.delivered[state.round]=true;event('delivered',{round:state.round});$('#transportResult').textContent='送达了！回想一下，你改变了什么才让它动起来？';say('小车已送达展台。');updateProgress()}}else if(moveStart!==null&&!drag&&Date.now()-lastCart>700)recordMove()},40);
 function renderReflect(){
  $('#station').innerHTML=`<h2>选词语，说发现</h2><p>每次填一空，点词语就能说出发现。不用打一大段字。“其他”只写几个字，也可以先和老师说。</p><div id="reflectionEditor"></div><h3>我说的发现</h3><p class="reflection-preview" id="reflectionPreview" aria-live="polite"></p>${!state.reflectionDraft&&state.reflection?`<details><summary>查看以前写的话（已保留）</summary><p>${escape(state.reflection)}</p></details>`:''}<div class="actions"><button id="backMaterial">返回补测</button><button id="finish" class="primary">完成调查并保存</button></div><p id="finishMessage"></p>`;
